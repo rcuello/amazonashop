@@ -1,0 +1,15 @@
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Application.deps.json
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Application.dll
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Application.pdb
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Domain.dll
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\bin\Debug\net8.0\Ecommerce.Domain.pdb
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.csproj.AssemblyReference.cache
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.AssemblyInfoInputs.cache
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.AssemblyInfo.cs
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.csproj.CoreCompileInputs.cache
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerc.C5F54E74.Up2Date
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.dll
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\refint\Ecommerce.Application.dll
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\Ecommerce.Application.pdb
+C:\DevOps\MyGitHub\Udemy\AmazonShop\Backend\src\Core\Ecommerce.Application\obj\Debug\net8.0\ref\Ecommerce.Application.dll
