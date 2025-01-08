@@ -9,5 +9,5 @@ public class Category : BaseDomainModel
     public string? Nombre { get; set; }
     
    
-
+    public virtual ICollection<Product>? Products { get; set; }
 }

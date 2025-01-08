@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Ecommerce.Domain.Common;
 
 namespace Ecommerce.Domain;
@@ -9,7 +8,6 @@ public class OrderItem : BaseDomainModel {
 
     public int ProductId {get;set;}
 
-    [Column(TypeName = "decimal(10,2)")]
     public decimal Precio { get; set; }
     
     public int Cantidad { get; set; }
