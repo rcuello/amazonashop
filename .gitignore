@@ -1,0 +1,57 @@
+# General build output directories
+**/bin/
+**/obj/
+
+# Debug and Release configurations
+**/bin/Debug/
+**/bin/Release/
+**/bin/x64/
+
+# Specific intermediate files
+**/obj/Debug/
+**/obj/Release/
+**/obj/x64/
+
+# AssemblyInfo auto-generated files
+**/obj/**/*.AssemblyInfo.cs
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+.nuget/
+
+# Logs
+*.log
+
+# IDE-specific files
+.vscode/
+.idea/
+*.csproj.user
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+~$*
+
+# Rider project files
+.idea/
+.idea.modules/
+
+# Visual Studio specific
+.vs/
+*.sln.ide
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build results (if stored in the project folder)
+output/
+release/
