@@ -55,3 +55,6 @@ Thumbs.db
 # Build results (if stored in the project folder)
 output/
 release/
+/Backend/src/Api/obj/Debug/net8.0/Ecommerce.Api.AssemblyInfo.cs
+/Backend/src/Api/obj/Debug/net8.0/Ecommerce.Api.AssemblyInfoInputs.cache
+/Backend/src/Api/obj/Debug/net8.0/Ecommerce.Api.csproj.AssemblyReference.cache

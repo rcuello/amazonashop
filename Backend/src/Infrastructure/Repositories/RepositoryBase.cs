@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Ecommerce.Application.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.Persistence.Repositories;
+namespace Ecommerce.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Clase base para implementar repositorios que interactúan con la base de datos.

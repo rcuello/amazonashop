@@ -1,6 +1,65 @@
+using System.Text;
+using Ecommerce.Domain;
+using Ecommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddDbContext<EcommerceDbContext>(options =>
+{
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("ConnectionString"),
+        b=> b.MigrationsAssembly(typeof(EcommerceDbContext).Assembly.FullName)
+    );    
+});
+
+builder.Services.AddControllers(opt=>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(policy));
+});
+
+IdentityBuilder identityBuilder = builder.Services.AddIdentityCore<Usuario>();
+identityBuilder = new IdentityBuilder(identityBuilder.UserType, identityBuilder.Services);
+
+identityBuilder.AddRoles<IdentityRole>().AddDefaultTokenProviders();
+identityBuilder.AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<Usuario, IdentityRole>>();
+
+identityBuilder.AddEntityFrameworkStores<EcommerceDbContext>();
+identityBuilder.AddSignInManager<SignInManager<Usuario>>();
+
+builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
+
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:key"]!));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true            
+        };
+    });
+
+builder.Services.AddCors(options=> {
+    options.AddPolicy("AllowAllPolicy", builder=> builder.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+});
+
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -17,6 +76,11 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseCors("AllowAllPolicy");
 
 app.MapControllers();
 
