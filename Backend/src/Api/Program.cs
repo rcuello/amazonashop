@@ -1,5 +1,9 @@
 using System.Text;
+using CloudinaryDotNet.Actions;
+using Ecommerce.Application;
+using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Domain;
+using Ecommerce.Infrastructure.ImageCloudinary;
 using Ecommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,16 +17,19 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 
 builder.Services.AddDbContext<EcommerceDbContext>(options =>
 {
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("ConnectionString"),
-        b=> b.MigrationsAssembly(typeof(EcommerceDbContext).Assembly.FullName)
-    );    
+        b => b.MigrationsAssembly(typeof(EcommerceDbContext).Assembly.FullName)
+    );
 });
 
-builder.Services.AddControllers(opt=>
+builder.Services.AddScoped<IManageImageService, ManageImageService>();
+
+builder.Services.AddControllers(opt =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
@@ -50,12 +57,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = key,
             ValidateIssuer = false,
             ValidateAudience = false,
-            ValidateLifetime = true            
+            ValidateLifetime = true
         };
     });
 
-builder.Services.AddCors(options=> {
-    options.AddPolicy("AllowAllPolicy", builder=> builder.AllowAnyOrigin()
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllPolicy", builder => builder.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
 });
@@ -83,6 +91,35 @@ app.UseAuthorization();
 app.UseCors("AllowAllPolicy");
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var service = scope.ServiceProvider;
+    var loggerFactory = service.GetRequiredService<ILoggerFactory>();
+    var logger = loggerFactory.CreateLogger<Program>();
+
+    try
+    {
+        var context = service.GetRequiredService<EcommerceDbContext>();
+        var userManager = service.GetRequiredService<UserManager<Usuario>>();
+        var roleManager = service.GetRequiredService<RoleManager<IdentityRole>>();
+
+        logger.LogInformation("Starting Migration ...");
+
+        await context.Database.MigrateAsync();
+
+        logger.LogDebug("Loading Data ...");
+        await EcommerceDbContextData.LoadDataAsync(context,userManager,roleManager,loggerFactory);
+
+        logger.LogInformation("Migration Completed !!!");
+    }
+    catch (Exception ex)
+    {
+        
+        logger.LogError(ex,"Error en la migration");
+    }
+
+}
 
 app.Run();
 

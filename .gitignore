@@ -3,17 +3,17 @@
 **/obj/
 
 # Debug and Release configurations
-**/bin/Debug/
-**/bin/Release/
+**/bin/[Dd]ebug/
+**/bin/[Rr]elease/
 **/bin/x64/
-
-# Specific intermediate files
-**/obj/Debug/
-**/obj/Release/
+**/obj/[Dd]ebug/
+**/obj/[Rr]elease/
 **/obj/x64/
 
-# AssemblyInfo auto-generated files
-**/obj/**/*.AssemblyInfo.cs
+# AssemblyInfo and intermediate files
+**/obj/**/*.AssemblyInfo.*
+**/obj/**/*.AssemblyReference.cache
+**/obj/**/*.Inputs.cache
 
 # User-specific files
 *.user
@@ -34,13 +34,13 @@
 .idea/
 *.csproj.user
 
-# Temporary files
+# Temporary and backup files
 *.tmp
 *.temp
 *.bak
 ~$*
 
-# Rider project files
+# Rider-specific project files
 .idea/
 .idea.modules/
 
@@ -52,9 +52,8 @@
 .DS_Store
 Thumbs.db
 
-# Build results (if stored in the project folder)
+# Build results or temporary output folders
 output/
 release/
-/Backend/src/Api/obj/Debug/net8.0/Ecommerce.Api.AssemblyInfo.cs
-/Backend/src/Api/obj/Debug/net8.0/Ecommerce.Api.AssemblyInfoInputs.cache
-/Backend/src/Api/obj/Debug/net8.0/Ecommerce.Api.csproj.AssemblyReference.cache
+
+
