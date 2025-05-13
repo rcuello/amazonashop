@@ -2,9 +2,11 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
+using Ecommerce.Application.Features.Products.Queries.GetProductList;
 using Ecommerce.Domain;
 using Ecommerce.Infrastructure.ImageCloudinary;
 using Ecommerce.Infrastructure.Persistence;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +30,7 @@ builder.Services.AddDbContext<EcommerceDbContext>(options =>
     );
 });
 
+builder.Services.AddMediatR(typeof(GetProductListQueryHandler).Assembly);
 builder.Services.AddScoped<IManageImageService, ManageImageService>();
 
 builder.Services.AddControllers(opt =>
