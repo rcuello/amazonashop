@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Application.Features.Products.Queries.GetProductList;
@@ -90,6 +91,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -139,5 +142,6 @@ app.Run();
 // dotnet run --project src/api --launch-profile "https"
 // https://localhost:5001/swagger/index.html
 
+//Datos de los usuarios => src\Infrastructure\Persistence\EcommerceDbContextData.cs
 
 
