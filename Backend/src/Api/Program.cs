@@ -1,5 +1,4 @@
 using System.Text;
-using CloudinaryDotNet.Actions;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Domain;

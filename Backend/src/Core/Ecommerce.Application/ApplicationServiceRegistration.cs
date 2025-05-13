@@ -1,6 +1,5 @@
 using AutoMapper;
 using Ecommerce.Application.Behaviors;
-using Ecommerce.Application.Extensions;
 using Ecommerce.Application.Mappings;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -26,10 +25,6 @@ public static class ApplicationServiceRegistration
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-
-
-
-        services.AddServiceEmail(configuration);
         return services;
     }
 }

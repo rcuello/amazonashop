@@ -7,6 +7,7 @@ using Ecommerce.Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ecommerce.Infrastructure.Services.Auth;
+using Ecommerce.Application.Models.Email;
 
 namespace Ecommerce.Infrastructure.Persistence;
 
@@ -18,10 +19,12 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
 
+        services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IAuthService, AuthService>();
         
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
         services.AddTransient<IEmailService, EmailService>();
         return services;
