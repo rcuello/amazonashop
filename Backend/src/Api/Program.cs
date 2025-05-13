@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Service registration
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
 
@@ -84,7 +85,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -92,6 +93,12 @@ app.UseAuthorization();
 app.UseCors("AllowAllPolicy");
 
 app.MapControllers();
+
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/swagger");
+    return Task.CompletedTask;
+});
 
 using (var scope = app.Services.CreateScope())
 {
@@ -123,5 +130,11 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+//cd amazonashop/Backend
+// dotnet run --project src/api
+// dotnet run --project src/api --launch-profile "https"
+// https://localhost:5001/swagger/index.html
+
 
 
