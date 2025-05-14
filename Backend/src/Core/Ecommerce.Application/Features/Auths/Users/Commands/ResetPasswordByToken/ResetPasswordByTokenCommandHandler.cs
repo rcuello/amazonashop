@@ -1,4 +1,5 @@
 using System.Text;
+using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Application.Exceptions;
 using Ecommerce.Domain;
 using MediatR;
@@ -9,10 +10,12 @@ namespace Ecommerce.Application.Features.Auths.Users.Commands.ResetPasswordByTok
 public class ResetPasswordByTokenCommandHandler : IRequestHandler<ResetPasswordByTokenCommand, string>
 {
     private readonly UserManager<Usuario> _userManager;
+    
 
     public ResetPasswordByTokenCommandHandler(UserManager<Usuario> userManager)
     {
         _userManager = userManager;
+        
     }
 
     public async Task<string> Handle(ResetPasswordByTokenCommand request, CancellationToken cancellationToken)

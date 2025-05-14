@@ -20,7 +20,7 @@ public class SendgridEmailService : IEmailService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<bool> SendEmail(EmailMessage email, string token)
+    public async Task<bool> SendEmail(IEmailMessage email)
     {
         if (email == null)
         {
@@ -49,14 +49,10 @@ public class SendgridEmailService : IEmailService
             var subject = email.Subject;
             var to = new EmailAddress(email.To, email.To);
 
-            var plainTextContent = email.Body;
+            // Renderizar el cuerpo del correo según el tipo específico de mensaje
+            string htmlContent = await email.RenderBodyAsync();
 
-            // Crear URL de reseteo de contraseña solo si el token no es nulo o vacío
-            string resetUrl = string.IsNullOrWhiteSpace(token)
-                ? email.Body
-                : $"{email.Body} {_emailSettings.BaseUrlClient}/password/reset/{token}";
-
-            var htmlContent = resetUrl;
+            var plainTextContent = string.Empty;            
 
             var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
 

@@ -1,10 +1,10 @@
-﻿using Ecommerce.Application.Models.Email;
+﻿using Ecommerce.Application.Contracts.Infrastructure;
+using Ecommerce.Application.Models.Email;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
 using System.Net;
-using System.Text;
-using Ecommerce.Application.Contracts.Infrastructure;
+
 
 namespace Ecommerce.Infrastructure.MessageImplementation;
 
@@ -22,8 +22,9 @@ public class MailtrapEmailService : IEmailService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<bool> SendEmail(EmailMessage email, string token)
-    {
+    public async Task<bool> SendEmail(IEmailMessage email)
+    {        
+
         if (email == null)
         {
             _logger.LogError("Error al enviar correo: el objeto email es nulo");
@@ -60,12 +61,15 @@ public class MailtrapEmailService : IEmailService
             _logger.LogInformation("Iniciando envío de correo a {EmailTo} con asunto '{Subject}' usando Mailtrap",
                 email.To, email.Subject);
 
+            // Renderizar el cuerpo del correo según el tipo específico de mensaje
+            string renderedBody = await email.RenderBodyAsync();
+
             // Crear mensaje de correo
             using var mailMessage = new MailMessage()
             {
                 From = new MailAddress(_emailSettings.Email, _emailSettings.DisplayName ?? "Ecommerce"),
                 Subject = email.Subject,
-                Body = PrepareEmailBody(email.Body, token),
+                Body = renderedBody,
                 IsBodyHtml = true
             };
 
@@ -120,33 +124,5 @@ public class MailtrapEmailService : IEmailService
             _logger.LogError(ex, "Excepción general al enviar correo a {EmailTo}: {Message}", email.To, ex.Message);
             return false;
         }
-    }
-
-    /// <summary>
-    /// Prepara el cuerpo del correo con formato HTML, incluyendo el token si es necesario
-    /// </summary>
-    private string PrepareEmailBody(string bodyContent, string token)
-    {
-        var bodyBuilder = new StringBuilder();
-        bodyBuilder.Append("<html><body>");
-        bodyBuilder.Append($"<div style='font-family: Arial, sans-serif; color: #333;'>");
-        bodyBuilder.Append($"<p>{bodyContent}</p>");
-
-        // Añadir enlace de restablecimiento de contraseña si hay token
-        if (!string.IsNullOrWhiteSpace(token))
-        {
-            var resetUrl = $"{_emailSettings.BaseUrlClient}/password/reset/{token}";
-            bodyBuilder.Append("<div style='margin: 20px 0;'>");
-            bodyBuilder.Append($"<a href='{resetUrl}' style='background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px;'>Restablecer contraseña</a>");
-            bodyBuilder.Append("</div>");
-            bodyBuilder.Append("<p style='font-size: 12px; color: #666;'>Si no solicitó restablecer su contraseña, ignore este correo electrónico.</p>");
-        }
-
-        bodyBuilder.Append("<hr style='border: 1px solid #eee; margin: 20px 0;'>");
-        bodyBuilder.Append($"<p style='font-size: 12px; color: #999;'>Este es un correo enviado desde el entorno de pruebas (Mailtrap).</p>");
-        bodyBuilder.Append("</div>");
-        bodyBuilder.Append("</body></html>");
-
-        return bodyBuilder.ToString();
     }
 }

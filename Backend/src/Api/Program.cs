@@ -135,6 +135,10 @@ using (var scope = app.Services.CreateScope())
 
 }
 
+// Precargar plantillas de correo electrónico
+app.UseTemplatePreloading(onlyInProduction: false);
+// Alternativa: app.UseTemplatePreloading(); // Solo precarga en producción por defecto
+
 app.Run();
 
 //cd amazonashop/Backend

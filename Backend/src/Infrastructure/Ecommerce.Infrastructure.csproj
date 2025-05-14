@@ -1,4 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">	
+  <ItemGroup>
+    <EmbeddedResource Include="_Embedded\EmailTemplates\ResetPassword.html" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Ecommerce.Application\Ecommerce.Application.csproj" />
@@ -14,7 +17,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Scriban" Version="6.2.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MessageImplementation\Models\" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -5,17 +5,19 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{98529241-84F9-4787-BEE5-A84197EE24BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Infrastructure", "..\..\..\..\..\..\..\..\DevOps\MyGitHub\Udemy\amazonashop\Backend\src\Infrastructure\Ecommerce.Infrastructure.csproj", "{C07D34F8-6D83-4B0B-B7CE-E39732A46ABC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Infrastructure", "src\Infrastructure\Ecommerce.Infrastructure.csproj", "{C07D34F8-6D83-4B0B-B7CE-E39732A46ABC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{D53A31D8-3140-472B-8B16-3DA640BB4119}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Core", "2. Core", "{D53A31D8-3140-472B-8B16-3DA640BB4119}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Domain", "..\..\..\..\..\..\..\..\DevOps\MyGitHub\Udemy\amazonashop\Backend\src\Core\Ecommerce.Domain\Ecommerce.Domain.csproj", "{2A698CC7-8470-4A1D-A9BA-1DE4B373DC14}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Domain", "src\Core\Ecommerce.Domain\Ecommerce.Domain.csproj", "{2A698CC7-8470-4A1D-A9BA-1DE4B373DC14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Application", "..\..\..\..\..\..\..\..\DevOps\MyGitHub\Udemy\amazonashop\Backend\src\Core\Ecommerce.Application\Ecommerce.Application.csproj", "{E6F0BDCF-2D47-4AB9-9295-2A131BD71BD6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Application", "src\Core\Ecommerce.Application\Ecommerce.Application.csproj", "{E6F0BDCF-2D47-4AB9-9295-2A131BD71BD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Api", "..\..\..\..\..\..\..\..\DevOps\MyGitHub\Udemy\amazonashop\Backend\src\Api\Ecommerce.Api.csproj", "{60BD4372-8E7F-47FA-B5EB-2D00EEB64B6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Api", "src\Api\Ecommerce.Api.csproj", "{60BD4372-8E7F-47FA-B5EB-2D00EEB64B6F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Infrastructure", "3. Infrastructure", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Domain", "1. Domain", "{390F7538-F071-4778-A124-42B2F9444286}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,10 +48,11 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C07D34F8-6D83-4B0B-B7CE-E39732A46ABC} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{D53A31D8-3140-472B-8B16-3DA640BB4119} = {98529241-84F9-4787-BEE5-A84197EE24BD}
-		{2A698CC7-8470-4A1D-A9BA-1DE4B373DC14} = {D53A31D8-3140-472B-8B16-3DA640BB4119}
+		{2A698CC7-8470-4A1D-A9BA-1DE4B373DC14} = {390F7538-F071-4778-A124-42B2F9444286}
 		{E6F0BDCF-2D47-4AB9-9295-2A131BD71BD6} = {D53A31D8-3140-472B-8B16-3DA640BB4119}
 		{60BD4372-8E7F-47FA-B5EB-2D00EEB64B6F} = {98529241-84F9-4787-BEE5-A84197EE24BD}
 		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {98529241-84F9-4787-BEE5-A84197EE24BD}
+		{390F7538-F071-4778-A124-42B2F9444286} = {98529241-84F9-4787-BEE5-A84197EE24BD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B0918534-EDBF-47EC-ACD7-B1EAF301799A}
