@@ -1,14 +1,21 @@
+using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Application.Exceptions;
 using Ecommerce.Application.Features.Auths.Users.Vms;
 using Ecommerce.Application.Identity;
+using Ecommerce.Application.Models.Email;
+using Ecommerce.Application.Models.Email.Messages;
 using Ecommerce.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace Ecommerce.Application.Features.Auths.Users.Commands.RegisterUser;
 
 public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, AuthResponse>
 {
+    private readonly IEmailService _serviceEmail;
+    private readonly ITemplateRender _templateRender;
+    private readonly EmailSettings _emailSettings;
     private readonly UserManager<Usuario> _userManager;
 
     private readonly RoleManager<IdentityRole> _roleManager;
@@ -16,11 +23,18 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
     private readonly IAuthService _authService;
 
     public RegisterUserCommandHandler(
+                        IOptions<EmailSettings> emailSettings, 
+                        IEmailService serviceEmail, 
+                        ITemplateRender templateRender,
                         UserManager<Usuario> userManager, 
                         RoleManager<IdentityRole> roleManager, 
                         IAuthService authService
                         )
     {
+        _emailSettings = emailSettings.Value ?? throw new ArgumentNullException(nameof(emailSettings));
+        _serviceEmail = serviceEmail;
+        _templateRender = templateRender;
+
         _userManager = userManager;
         _roleManager = roleManager;
         _authService = authService;
@@ -56,7 +70,16 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
         {
             await _userManager.AddToRoleAsync(usuario, AppRole.GenericUser);
             var roles = await _userManager.GetRolesAsync(usuario);
-            
+
+            var emailMessage = new WelcomeUserEmailMessage(_templateRender)
+            {
+                To = request.Email,
+                UserName=usuario.UserName,
+                GettingStartedLink = "https://tuapp.com/empezar",                
+            };
+
+            var result = await _serviceEmail.SendEmail(emailMessage);
+
             return new AuthResponse
             {
                 Id = usuario.Id,
