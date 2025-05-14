@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">	
   <ItemGroup>
+    <EmbeddedResource Include="_Embedded\EmailTemplates\PasswordUpdated.html" />
     <EmbeddedResource Include="_Embedded\EmailTemplates\ResetPassword.html" />
   </ItemGroup>
 

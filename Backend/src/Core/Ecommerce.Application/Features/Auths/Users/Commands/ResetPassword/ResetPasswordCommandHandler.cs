@@ -1,18 +1,29 @@
+using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Application.Exceptions;
 using Ecommerce.Application.Identity;
+using Ecommerce.Application.Models.Email;
+using Ecommerce.Application.Models.Email.Messages;
 using Ecommerce.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace Ecommerce.Application.Features.Auths.Users.Commands.ResetPassword;
 
 public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand>
 {
+    private readonly IEmailService _serviceEmail;
+    private readonly ITemplateRender _templateRender;
+    private readonly EmailSettings _emailSettings;
     private readonly UserManager<Usuario> _userManager;
     private readonly IAuthService _authService;
 
-    public ResetPasswordCommandHandler(UserManager<Usuario> userManager, IAuthService authService)
+    public ResetPasswordCommandHandler(IOptions<EmailSettings> emailSettings, IEmailService serviceEmail, ITemplateRender templateRender,UserManager<Usuario> userManager, IAuthService authService)
     {
+        _emailSettings = emailSettings.Value ?? throw new ArgumentNullException(nameof(emailSettings));
+        _serviceEmail = serviceEmail;
+        _templateRender = templateRender;
+
         _userManager = userManager;
         _authService = authService;
     }
@@ -38,10 +49,21 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand>
 
         var resultado = await _userManager.UpdateAsync(updateUsuario);
 
-        if(!resultado.Succeeded)
+        if (resultado.Succeeded)
+        {
+            var emailMessage = new PasswordUpdatedEmailMessage(_templateRender)
+            {
+                To = updateUsuario.Email,
+                LoginLink = "https://tuapp.com/login",
+                BodyContent = "Tu contraseña ha sido actualizada correctamente."
+            };
+
+            var result = await _serviceEmail.SendEmail(emailMessage);
+        }
+        else
         {
             throw new Exception("No se pudo resetear el password");
-        }
+        }        
 
         return Unit.Value;              
     }
