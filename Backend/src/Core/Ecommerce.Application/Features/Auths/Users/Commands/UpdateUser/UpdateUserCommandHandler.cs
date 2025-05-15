@@ -44,7 +44,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, AuthR
             throw new Exception("No se pudo actualizar el usuario");
         }
 
-        var userById = await _userManager.FindByEmailAsync(request.Email!);
+        var userById = await _userManager.FindByEmailAsync(updateUsuario.Email!);
         var roles = await _userManager.GetRolesAsync(userById!);
 
         return new AuthResponse
