@@ -1,23 +1,32 @@
+
 using System.Net;
-using Ecommerce.Api.Errors;
 using Ecommerce.Application.Exceptions;
+using Ecommerce.Application.Exceptions.App;
+using Ecommerce.Application.Models.Api;
 using Newtonsoft.Json;
+using SendGrid.Helpers.Errors.Model;
 
 namespace Ecommerce.Api.Middlewares;
 
 public class ExceptionMiddleware 
 {
     private readonly RequestDelegate _next;
-
     private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly IHostEnvironment _environment;
+    private readonly Dictionary<Type, Func<Exception, (HttpStatusCode StatusCode, string[] Messages)>> _exceptionHandlers;
 
     public ExceptionMiddleware(
             RequestDelegate next,
-            ILogger<ExceptionMiddleware> logger
+            ILogger<ExceptionMiddleware> logger,
+            IHostEnvironment environment
     )
     {
         _next = next;
         _logger = logger;
+        _environment = environment;
+
+        // Inicializar el diccionario de manejadores de excepciones
+        _exceptionHandlers = InitializeExceptionHandlers();
     }
 
 
@@ -25,51 +34,130 @@ public class ExceptionMiddleware
     {
         try
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             await _next(context);
         }
-        catch(Exception ex)
+        catch (Exception exception)
         {
-            _logger.LogError(ex, ex.Message);
-            context.Response.ContentType = "application/json";
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            var result = string.Empty;
+            // Registrar la excepción con un ID de correlación para seguimiento
+            var correlationId = context.TraceIdentifier;
+            _logger.LogError(exception, "Error no manejado {CorrelationId}: {ExceptionType} - {ExceptionMessage}",
+                correlationId, exception.GetType().Name, exception.Message);
 
-            switch(ex)
-                {
-                    case NotFoundException notFoundException:
-                        statusCode = (int)HttpStatusCode.NotFound;
-                        break;
-                    
-                    case FluentValidation.ValidationException validationException:
-                        statusCode = (int)HttpStatusCode.BadRequest;
-                        var errors = validationException.Errors.Select(ers => ers.ErrorMessage).ToArray();
-                        var validationJsons = JsonConvert.SerializeObject(errors);
-                        result = JsonConvert.SerializeObject(
-                            new CodeErrorException(statusCode, errors, validationJsons)
-                        );
-                        break;
-
-                    case BadRequestException badRequestException:
-                        statusCode = (int)HttpStatusCode.BadRequest;
-                        break;
-
-                    default:
-                        statusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
-                }
-
-                if(string.IsNullOrEmpty(result))
-                {
-                    result = JsonConvert.SerializeObject(
-                        new CodeErrorException(statusCode, 
-                                                new string[]{ex.Message}, ex.StackTrace));
-                }
-
-                context.Response.StatusCode = statusCode;
-                await context.Response.WriteAsync(result);
+            // Asegurarse de que la respuesta no se haya enviado ya
+            if (!context.Response.HasStarted)
+            {
+                await HandleExceptionAsync(context, exception, correlationId);
+            }
+            else
+            {
+                _logger.LogWarning("No se pudo enviar la respuesta de error porque la respuesta ya ha comenzado");
+            }
         }
-
     }
 
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception, string correlationId)
+    {
+        context.Response.ContentType = "application/json";
+
+        // Obtener el código de estado y mensajes apropiados para esta excepción
+        var (statusCode, messages) = GetStatusCodeAndMessages(exception);
+        context.Response.StatusCode = (int)statusCode;
+
+        // Crear la respuesta de error
+        var errorResponse = new ApiErrorResponse
+        {
+            StatusCode = (int)statusCode,
+            Message = messages,
+            TraceId = correlationId
+        };
+
+        // Agregar detalles adicionales en entorno de desarrollo
+        if (_environment.IsDevelopment())
+        {
+            errorResponse.Details = exception.StackTrace;
+
+            // Recolectar excepciones internas en una colección para mejor diagnóstico
+            var innerExceptions = new List<string>();
+            var currentException = exception.InnerException;
+            while (currentException != null)
+            {
+                innerExceptions.Add($"{currentException.GetType().Name}: {currentException.Message}");
+                currentException = currentException.InnerException;
+            }
+
+            if (innerExceptions.Any())
+            {
+                errorResponse.InnerErrors = innerExceptions;
+            }
+        }
+
+        // Serializar y escribir la respuesta
+        var result = JsonConvert.SerializeObject(
+            errorResponse,
+            new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = _environment.IsDevelopment() ? Formatting.Indented : Formatting.None
+            });
+
+        await context.Response.WriteAsync(result);
+    }
+
+    private (HttpStatusCode StatusCode, string[] Messages) GetStatusCodeAndMessages(Exception exception)
+    {
+        // Buscar un manejador específico para este tipo de excepción
+        foreach (var handler in _exceptionHandlers)
+        {
+            if (handler.Key.IsInstanceOfType(exception))
+            {
+                return handler.Value(exception);
+            }
+        }
+
+        // Manejador por defecto para excepciones desconocidas
+        return (HttpStatusCode.InternalServerError, new[] { "Ha ocurrido un error interno." });
+    }
+
+    private Dictionary<Type, Func<Exception, (HttpStatusCode, string[])>> InitializeExceptionHandlers()
+    {
+        return new Dictionary<Type, Func<Exception, (HttpStatusCode, string[])>>
+        {
+            [typeof(Ecommerce.Application.Exceptions.NotFoundException)] = ex =>
+                (HttpStatusCode.NotFound, new[] { ex.Message }),
+
+            [typeof(FluentValidation.ValidationException)] = ex =>
+            {
+                var validationEx = (FluentValidation.ValidationException)ex;
+                var errors = validationEx.Errors
+                    .Select(e => e.ErrorMessage)
+                    .ToArray();
+                return (HttpStatusCode.BadRequest, errors);
+            },
+
+            [typeof(Ecommerce.Application.Exceptions.BadRequestException)] = ex =>
+                (HttpStatusCode.BadRequest, new[] { ex.Message }),
+
+            [typeof(DatabaseConnectionException)] = ex =>
+                (HttpStatusCode.ServiceUnavailable, new[] { ex.Message }),
+
+            [typeof(DataAccessException)] = ex =>
+                (HttpStatusCode.InternalServerError, new[] { ex.Message }),
+
+            [typeof(AuthenticationException)] = ex =>
+                (HttpStatusCode.Unauthorized, new[] { ex.Message }),
+
+            [typeof(TimeoutException)] = ex =>
+                (HttpStatusCode.RequestTimeout, new[] { "La operación ha excedido el tiempo de espera." }),
+
+            [typeof(UnauthorizedException)] = ex =>
+                (HttpStatusCode.Forbidden, new[] { ex.Message }),
+            
+        };
+    }
 
 }
