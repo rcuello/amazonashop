@@ -11,6 +11,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -74,6 +75,12 @@ builder.Services.AddCors(options =>
     .AllowAnyHeader());
 });
 
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueLengthLimit = 52428800; // 50MB en bytes
+    options.MultipartBodyLengthLimit = 52428800; // 50MB en bytes
+    options.MultipartHeadersLengthLimit = 52428800; // 50MB en bytes
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
