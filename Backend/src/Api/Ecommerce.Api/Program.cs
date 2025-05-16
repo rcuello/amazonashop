@@ -137,6 +137,12 @@ if (app.Environment.IsDevelopment())
     {
         options.SwaggerEndpoint("/openapi/v1.json", "Ecommerce API");        
     });
+
+    app.MapGet("/", context =>
+    {
+        context.Response.Redirect("/swagger");
+        return Task.CompletedTask;
+    });
 }
 
 app.UseHttpsRedirection();
@@ -150,11 +156,7 @@ app.UseCors("AllowAllPolicy");
 
 app.MapControllers();
 
-app.MapGet("/", context =>
-{
-    context.Response.Redirect("/swagger");
-    return Task.CompletedTask;
-});
+
 
 using (var scope = app.Services.CreateScope())
 {
