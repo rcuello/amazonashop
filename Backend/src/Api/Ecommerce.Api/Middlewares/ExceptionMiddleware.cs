@@ -141,7 +141,7 @@ public class ExceptionMiddleware
             [typeof(DataAccessException)] = ex =>
                 (HttpStatusCode.InternalServerError, new[] { ex.Message }),
 
-            [typeof(AuthenticationException)] = ex =>
+            [typeof(UserAuthenticationException)] = ex =>
                 (HttpStatusCode.Unauthorized, new[] { ex.Message }),
 
             [typeof(TimeoutException)] = ex =>
