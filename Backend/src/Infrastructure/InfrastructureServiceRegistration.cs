@@ -12,6 +12,7 @@ using Ecommerce.Infrastructure.MessageImplementation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Builder;
+using Ecommerce.Application.Models.Payment;
 
 namespace Ecommerce.Infrastructure.Persistence;
 
@@ -107,6 +108,9 @@ public static class InfrastructureServiceRegistration
 
         // Servicios de almacenamiento de imágenes
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+
+        // Servicios de pagos
+        services.Configure<StripeSettings>(configuration.GetSection("StripeSettings"));
 
         // Servicios de correo y plantillas
         services.ConfigureEmailServices(configuration);
