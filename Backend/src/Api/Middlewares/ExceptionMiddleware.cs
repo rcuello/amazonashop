@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Ecommerce.Application.Exceptions.App;
 using Ecommerce.Application.Models.Api;
 using SendGrid.Helpers.Errors.Model;
@@ -18,7 +17,8 @@ public class ExceptionMiddleware
     public ExceptionMiddleware(
             RequestDelegate next,
             ILogger<ExceptionMiddleware> logger,
-            IHostEnvironment environment
+            IHostEnvironment environment,
+            JsonSerializerOptions jsonOptions
     )
     {
         _next = next;
@@ -28,13 +28,7 @@ public class ExceptionMiddleware
         // Inicializar el diccionario de manejadores de excepciones
         _exceptionHandlers = InitializeExceptionHandlers();
 
-        // Configurar opciones de serialización JSON
-        _jsonOptions = new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            WriteIndented = _environment.IsDevelopment(),
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
+        _jsonOptions = jsonOptions;
     }
 
     public async Task InvokeAsync(HttpContext context)

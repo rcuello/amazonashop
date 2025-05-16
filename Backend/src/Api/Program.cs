@@ -24,16 +24,59 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
 
-builder.Services.AddDbContext<EcommerceDbContext>(options =>
+builder.Services.AddDbContext<EcommerceDbContext>(option =>
 {
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("ConnectionString"),
-        b => b.MigrationsAssembly(typeof(EcommerceDbContext).Assembly.FullName)
+    var connectionString = builder.Configuration.GetConnectionString("ConnectionString");
+
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        throw new InvalidOperationException("La cadena de conexión 'ConnectionString' no está configurada en appsettings.json");
+    }
+
+    option.UseSqlServer(
+        connectionString,
+        sqlOptions => {
+            // Especificar el assembly de migraciones
+            sqlOptions.MigrationsAssembly(typeof(EcommerceDbContext).Assembly.FullName);
+
+            // Opciones adicionales
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+
+            sqlOptions.CommandTimeout(30); // Tiempo de espera en segundos
+        }
     );
 });
 
 builder.Services.AddMediatR(typeof(GetProductListQueryHandler).Assembly);
 builder.Services.AddScoped<IManageImageService, ManageImageService>();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    options.SerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+});
+
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    options.JsonSerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+});
+
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var environment = serviceProvider.GetRequiredService<IHostEnvironment>();
+    return new System.Text.Json.JsonSerializerOptions
+    {
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        WriteIndented = environment.IsDevelopment(),
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+    };
+});
 
 builder.Services.AddControllers(opt =>
 {
