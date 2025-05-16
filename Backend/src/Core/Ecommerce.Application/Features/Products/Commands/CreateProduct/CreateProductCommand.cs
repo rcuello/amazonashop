@@ -19,7 +19,7 @@ public class CreateProductCommand : IRequest<ProductVm>
 
     public string? CategoryId { get; set; }
 
-    public List<IFormFile>? Imagenes { get; set; }
+    public List<IFormFile>? Fotos { get; set; }
 
     [IgnoreDataMember]
     public IReadOnlyList<CreateProductImageCommand>? ImageUrls {get;set;}

@@ -127,7 +127,7 @@ public class ExceptionMiddleware
     {
         return new Dictionary<Type, Func<Exception, (HttpStatusCode, string[])>>
         {
-            [typeof(Ecommerce.Application.Exceptions.NotFoundException)] = ex =>
+            [typeof(Ecommerce.Application.Exceptions.EntityNotFoundException)] = ex =>
                 (HttpStatusCode.NotFound, new[] { ex.Message }),
 
             [typeof(FluentValidation.ValidationException)] = ex =>

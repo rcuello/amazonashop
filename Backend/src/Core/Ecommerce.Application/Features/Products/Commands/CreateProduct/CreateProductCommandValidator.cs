@@ -26,13 +26,13 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(p => p.Precio)
             .NotEmpty().WithMessage("El precio no puede ser nulo");
 
-        When(p => p.Imagenes != null && p.Imagenes.Any(), () => { 
-            RuleFor(p=> p.Imagenes)
+        When(p => p.Fotos != null && p.Fotos.Any(), () => { 
+            RuleFor(p=> p.Fotos)
                 .NotNull()
                 .Must(files => files != null && files.All(f => f.Length > 0 && f.Length <= MaxFileSize))
                 .WithMessage($"Las imágenes no pueden estar vacías y deben ser menores a {MaxFileSizeMb}MB");
 
-            RuleForEach(p => p.Imagenes)
+            RuleForEach(p => p.Fotos)
                 .SetValidator(new ImageFileValidator(_allowedExtensions, _allowedContentTypes));
         });
 

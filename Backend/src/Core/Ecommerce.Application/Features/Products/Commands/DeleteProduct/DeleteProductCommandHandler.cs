@@ -24,7 +24,7 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand,
         var productToUpdate = await _unitOfWork.Repository<Product>().GetByIdAsync(request.ProductId);
         if(productToUpdate is null)
         {
-            throw new NotFoundException(nameof(Product), request.ProductId);
+            throw new EntityNotFoundException(nameof(Product), request.ProductId);
         }
 
         productToUpdate.Status = productToUpdate.Status == ProductStatus.Inactivo 

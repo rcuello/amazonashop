@@ -24,7 +24,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
        var productToUpdate = await _unitOfWork.Repository<Product>().GetByIdAsync(request.Id);
        if(productToUpdate is null)
        {
-        throw new NotFoundException(nameof(Product), request.Id);
+        throw new EntityNotFoundException(nameof(Product), request.Id);
        }
 
        _mapper.Map(request, productToUpdate, typeof(UpdateProductCommand), typeof(Product));

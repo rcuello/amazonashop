@@ -44,7 +44,7 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, AuthRes
         var user = await _userManager.FindByEmailAsync(request.Email!);
         if(user is null)
         {
-            throw new NotFoundException(nameof(Usuario), request.Email!);
+            throw new EntityNotFoundException(nameof(Usuario), request.Email!);
         }
 
         if(!user.IsActive)

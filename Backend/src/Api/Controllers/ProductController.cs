@@ -71,17 +71,17 @@ namespace Ecommerce.Api.Controllers
         public async Task<ActionResult<ProductVm>> CreateProduct([FromForm] CreateProductCommand request)
         {           
             // Verificar si llegaron fotos
-            if (request.Imagenes == null || request.Imagenes.Count == 0)
+            if (request.Fotos == null || request.Fotos.Count == 0)
             {
                 _logger.LogWarning("No se recibieron imágenes en la solicitud");
             }
             else
             {
-                _logger.LogInformation($"Recibidas {request.Imagenes.Count} fotos");
+                _logger.LogInformation($"Recibidas {request.Fotos.Count} fotos");
 
                 var listFotoUrls = new List<CreateProductImageCommand>();
 
-                foreach (var foto in request.Imagenes)
+                foreach (var foto in request.Fotos)
                 {
                     _logger.LogInformation($"Procesando foto: {foto.FileName}, Tamaño: {foto.Length} bytes");
 
