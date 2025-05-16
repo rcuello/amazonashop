@@ -1,19 +1,19 @@
-
 using System.Net;
-using Ecommerce.Application.Exceptions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Ecommerce.Application.Exceptions.App;
 using Ecommerce.Application.Models.Api;
-using Newtonsoft.Json;
 using SendGrid.Helpers.Errors.Model;
 
 namespace Ecommerce.Api.Middlewares;
 
-public class ExceptionMiddleware 
+public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
     private readonly IHostEnvironment _environment;
     private readonly Dictionary<Type, Func<Exception, (HttpStatusCode StatusCode, string[] Messages)>> _exceptionHandlers;
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public ExceptionMiddleware(
             RequestDelegate next,
@@ -27,8 +27,15 @@ public class ExceptionMiddleware
 
         // Inicializar el diccionario de manejadores de excepciones
         _exceptionHandlers = InitializeExceptionHandlers();
-    }
 
+        // Configurar opciones de serialización JSON
+        _jsonOptions = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = _environment.IsDevelopment(),
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+    }
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -96,16 +103,8 @@ public class ExceptionMiddleware
             }
         }
 
-        // Serializar y escribir la respuesta
-        var result = JsonConvert.SerializeObject(
-            errorResponse,
-            new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = _environment.IsDevelopment() ? Formatting.Indented : Formatting.None
-            });
-
-        await context.Response.WriteAsync(result);
+        // Serializar y escribir la respuesta usando System.Text.Json
+        await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse, _jsonOptions));
     }
 
     private (HttpStatusCode StatusCode, string[] Messages) GetStatusCodeAndMessages(Exception exception)
@@ -156,8 +155,7 @@ public class ExceptionMiddleware
 
             [typeof(UnauthorizedException)] = ex =>
                 (HttpStatusCode.Forbidden, new[] { ex.Message }),
-            
+
         };
     }
-
 }
