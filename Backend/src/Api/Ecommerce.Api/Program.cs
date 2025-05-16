@@ -125,18 +125,18 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartHeadersLengthLimit = 52428800; // 50MB en bytes
 });
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "Ecommerce API");        
+    });
 }
 
 app.UseHttpsRedirection();
@@ -170,7 +170,10 @@ using (var scope = app.Services.CreateScope())
 
         logger.LogInformation("Starting Migration ...");
 
-        await context.Database.MigrateAsync();
+        //await context.Database.MigrateAsync();
+
+        //RC: Por ahora Esto creará la base de datos según el modelo actual, pero no mantendrá las migraciones.
+        await context.Database.EnsureCreatedAsync();
 
         logger.LogDebug("Loading Data ...");
         await EcommerceDbContextData.LoadDataAsync(context,userManager,roleManager,loggerFactory);
