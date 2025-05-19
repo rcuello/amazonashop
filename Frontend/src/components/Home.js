@@ -1,8 +1,10 @@
 import React,{Fragment} from "react";
+import MetaData from "./layout/MetaData";
 
 const Home = () => {
   return (
     <Fragment>
+      <MetaData titulo={'Los mejores productos online'} />
       <section id="products" className="container mt-5">
         <div className="row">
           <div className="col-sm-12 col-md-6 col-lg-3 my-3">
