@@ -7,13 +7,13 @@ const Product = ({ product, col }) => {
 
     <div className={`col-sm-12 col-md-6 col-lg-${col} my-3`}>
       <div className="card p-3 rounded">
-        <img
+        <img alt="Producto"
           className="card-img-top mx-auto"
           src={product.images[0] ? product.images[0].url : default_image}
         />
         <div className="card-body d-flex flex-column">
           <h5 className="card-title">
-            <Link>${product.nombre}</Link>
+            <Link>{product.nombre}</Link>
           </h5>
           <div className="ratings mt-auto">
             <div className="rating-outer">

@@ -4,19 +4,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../actions/productsAction";
 import Product from "./product/Product";
 import Loader from "./layout/Loader";
+import { useAlert } from "react-alert";
 
 const Home = () => {
   const dispatch = useDispatch();
   const { products, loading, error } = useSelector((state) => state.products);
 
-  useEffect(() => {
-    dispatch(getProducts());
-  }, [dispatch]);
+  const alert = useAlert();
 
-  if(loading){
-    return (
-      <Loader />
-    );
+  useEffect(() => {
+    if (error != null) {
+      return alert.error(error);
+    }
+
+    dispatch(getProducts());
+    
+  }, [dispatch, alert, error]);
+
+  if (loading) {
+    return <Loader />;
   }
 
   return (
