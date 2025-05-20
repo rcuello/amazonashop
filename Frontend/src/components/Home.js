@@ -2,9 +2,8 @@ import React, { Fragment, useEffect } from "react";
 import MetaData from "./layout/MetaData";
 import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../actions/productsAction";
-import Product from "./product/Product";
-import Loader from "./layout/Loader";
 import { useAlert } from "react-alert";
+import Products from "./products/Products";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -18,25 +17,16 @@ const Home = () => {
     }
 
     dispatch(getProducts());
-    
-  }, [dispatch, alert, error]);
 
-  if (loading) {
-    return <Loader />;
-  }
+  }, [dispatch, alert, error]);
+  
 
   return (
     <Fragment>
       <MetaData titulo={"Los mejores productos online"} />
       <section id="products" className="container mt-5">
         <div className="row">
-          {products ? (
-            products.map((productItem) => (
-              <Product product={productItem} col={4} />
-            ))
-          ) : (
-            <p>No hay productos</p>
-          )}
+          <Products col={4} products={products} loading={loading} />
         </div>
       </section>
     </Fragment>
