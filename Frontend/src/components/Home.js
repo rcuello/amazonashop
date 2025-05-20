@@ -3,14 +3,21 @@ import MetaData from "./layout/MetaData";
 import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../actions/productsAction";
 import Product from "./product/Product";
+import Loader from "./layout/Loader";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { products } = useSelector((state) => state.products);
+  const { products, loading, error } = useSelector((state) => state.products);
 
   useEffect(() => {
     dispatch(getProducts());
   }, [dispatch]);
+
+  if(loading){
+    return (
+      <Loader />
+    );
+  }
 
   return (
     <Fragment>
