@@ -7,7 +7,12 @@ import MetaData from "./layout/MetaData";
 import Product from "./product/Product";
 import Products from "./products/Products";
 import Pagination from "react-js-pagination";
-import { setPageIndex, updatePrecio } from "../slices/productPaginationSlice";
+import {
+  setPageIndex,
+  updateCategory,
+  updatePrecio,
+  updateRating,
+} from "../slices/productPaginationSlice";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
@@ -17,6 +22,8 @@ const Range = createSliderWithTooltip(Slider.Range);
 const Home = () => {
   const [precio, setPrecio] = useState([1, 10000]);
   const dispatch = useDispatch();
+
+  const { categories } = useSelector((state) => state.category);
 
   //const { products, loading, error } = useSelector((state) => state.products);
   const {
@@ -77,6 +84,14 @@ const Home = () => {
     dispatch(updatePrecio({ precio: precioEvent }));
   }
 
+  function onChangeCategory(ctg) {
+    dispatch(updateCategory({ category: ctg.id }));
+  }
+
+  function onChangeStar(star) {
+    dispatch(updateRating({ rating: star }));
+  }
+
   return (
     <Fragment>
       <MetaData titulo={"Los mejores productos online"} />
@@ -97,6 +112,46 @@ const Home = () => {
                     onChange={onChangePrecio}
                     onAfterChange={onAfterChange}
                   />
+                </div>
+
+                <hr className="my-5" />
+
+                <div className="mt-5">
+                  <h4 className="mb-3">Categorias</h4>
+                  <ul className="pl-0">
+                    {categories.map((ctg) => (
+                      <li
+                        style={{ cursor: "pointer", listStyleType: "none" }}
+                        key={ctg.id}
+                        onClick={() => onChangeCategory(ctg)}
+                      >
+                        {ctg.nombre}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <hr className="my-5" />
+
+                <div className="mt-5">
+                  <h4 className="mb-3">Ratings</h4>
+
+                  <ul className="pl-0">
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <li
+                        style={{ cursor: "pointer", listStyleType: "none" }}
+                        key={star}
+                        onClick={() => onChangeStar(star)}
+                      >
+                        <div className="rating-outer">
+                          <div
+                            className="rating-inner"
+                            style={{ width: `${star * 20}%` }}
+                          ></div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
               <div className="col-6 col-md-9">

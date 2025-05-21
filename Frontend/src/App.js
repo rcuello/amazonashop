@@ -4,8 +4,19 @@ import Home from "./components/Home";
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";
 import ProductDetail from "./components/products/ProductDetail";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { getCategories } from "./actions/categoryAction";
+
 
 function App() {
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getCategories({}));
+
+  }, [dispatch]);
+
   return (
     <Router>
       <div className="App">
