@@ -200,6 +200,7 @@ INSTRUCCIONES DE USO:
    npm install -g k6
  
 2. Ejecutar con ambiente específico:
+   k6 run scenarios/auth/login-rate-limit.js -e ENVIRONMENT=local  
    k6 run scenarios/auth/login-rate-limit.js --out json=reports/json/login-rate-limit.json
    k6 run scenarios/auth/login-rate-limit.js -e ENVIRONMENT=local --out json=reports/json/login-rate-limit-local.json
    k6 run scenarios/auth/login-rate-limit.js -e ENVIRONMENT=dev --out json=reports/json/login-rate-limit-dev.json

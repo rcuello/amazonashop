@@ -17,6 +17,10 @@ export class Logger {
     }
   }
 
+  warn(message) {
+    console.warn(`⚠️ [${this.env}] ${message}`);
+  }
+
   separator(char = '═', length = 50) {
     console.log(char.repeat(length));
   }
