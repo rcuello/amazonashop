@@ -1,0 +1,18 @@
+{
+  "baseUrl": "https://localhost:5001",
+  "debug": true,
+  "authTokenField": "token",
+  "endpoints": {
+    "login": "/api/v1/Usuario/login",
+    "register": "/api/v1/Usuario/register",
+    "products": "/api/v1/Product",
+    "orders": "/api/v1/Order",
+    "cart": "/api/v1/ShoppingCart"
+  },
+  "defaultHeaders": {
+    "User-Agent": "k6-performance-test-local/1.0"
+  },
+  "requestConfig": {
+    "timeout": "30s"
+  }
+}

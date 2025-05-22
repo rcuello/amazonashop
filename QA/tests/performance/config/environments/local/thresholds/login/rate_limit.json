@@ -1,0 +1,9 @@
+{
+  "http_req_duration": ["p(95)<2000", "p(99)<5000"],
+  "http_req_failed": ["rate<0.3"],
+  "rate_limit_errors": ["count<50"],
+  "successful_logins": ["count>5"],
+  "auth_token_validation_rate": ["rate>0.7"],
+  "blocked_requests": ["count<30"],
+  "unauthorized_requests": ["count<20"]
+}
