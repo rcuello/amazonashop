@@ -70,13 +70,13 @@ export const update = createAsyncThunk(
         },
       };
 
-      const { data } = await axios.post(
+      const { data } = await axios.put(
         `/api/v1/usuario/update`,
         params,
         requestConfig
       );
 
-      localStorage.setitem("token", data.token);
+      localStorage.setItem("token", data.token);
       
       // Simulate a delay
       await delayedTimeout(1000);

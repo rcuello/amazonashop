@@ -134,6 +134,23 @@ export const securitySlice = createSlice({
             state.errores = action.payload;
             state.isAuthenticated = false;
             state.user = null;
+        },
+
+        [saveAddressInfo.pending] : (state) => {
+            state.loading = true;
+            state.errores = []
+        },
+        [saveAddressInfo.fulfilled]: (state, {payload}) => {
+            state.loading= false;
+            state.isUpdated = true;
+            state.errores = [];
+            state.direccionEnvio = payload;
+        },
+        [saveAddressInfo.rejected]: (state, action) => {
+            state.loading = false;
+            state.errores = action.payload;
+            state.isAuthenticated = false;
+            state.user = null;
         }
     }
 });

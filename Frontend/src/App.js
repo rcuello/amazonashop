@@ -12,6 +12,7 @@ import Register from "./components/security/Register";
 import Profile from "./components/security/Profile";
 import ProtectedRoute from "./components/route/ProtectedRoute";
 import { loadUser } from "./actions/userAction";
+import UpdateProfile from "./components/security/UpdateProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -36,9 +37,14 @@ function App() {
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
             <Route exact path="/me" element={<ProtectedRoute />}>
               <Route path="/me" element={<Profile />} />
             </Route>
+
+            <Route exact path="/me/update" element={<ProtectedRoute />}>
+                <Route path="/me/update" element={<UpdateProfile />} />
+              </Route>
           </Routes>
         </div>
 
