@@ -15,6 +15,7 @@ using Ecommerce.Application.Features.Auths.Users.Queries.GetUserByUsername;
 using Ecommerce.Application.Features.Auths.Users.Queries.PaginationUsers;
 using Ecommerce.Application.Features.Auths.Users.Vms;
 using Ecommerce.Application.Features.Shared.Queries;
+using Ecommerce.Application.Models.Api;
 using Ecommerce.Application.Models.Authorization;
 using Ecommerce.Application.Models.ImageManagment;
 using Ecommerce.Domain;
@@ -40,7 +41,10 @@ public class UsuarioController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("login", Name = "Login")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(AuthResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), (int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(ApiErrorResponse), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ApiErrorResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginUserCommand request)
     {
         return await _mediator.Send(request);
