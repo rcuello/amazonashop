@@ -1,0 +1,24 @@
+{
+  "name": "amazonashop-performance-tests",
+  "version": "1.0.0",
+  "description": "Performance tests for AmazonaShop E-commerce API using K6",
+  "scripts": {
+    "test:auth": "k6 run scenarios/auth/login-rate-limit.js",
+    "test:auth:stress": "k6 run scenarios/auth/login-stress.js",
+    "test:auth:spike": "k6 run scenarios/auth/login-spike.js",
+    "test:auth:endurance": "k6 run scenarios/auth/login-endurance.js",
+    "test:all": "./scripts/run-all-tests.sh",
+    "report": "./scripts/generate-report.sh"
+  },
+  "keywords": [
+    "performance",
+    "k6",
+    "load-testing",
+    "rate-limit",
+    "stress",
+    "ecommerce"
+  ],
+  "author": "Profesor de Programación",
+  "license": "MIT",
+  "notes": "Nota: K6 debe instalarse de forma global o estar en el PATH. Ver: https://k6.io/docs/getting-started/installation/"
+}

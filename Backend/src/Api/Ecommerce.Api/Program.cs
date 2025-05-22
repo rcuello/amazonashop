@@ -223,6 +223,7 @@ app.Run();
 //cd amazonashop/Backend
 // dotnet run --project src/api
 // dotnet run --project src/api --launch-profile "https"
+// dotnet run --project Backend/src/Api/Ecommerce.Api --launch-profile "https"
 // https://localhost:5001/swagger/index.html
 
 //Datos de los usuarios => src\Infrastructure\Persistence\EcommerceDbContextData.cs

@@ -1,0 +1,15 @@
+{
+  "baseUrl": "https://localhost:5001",
+  "apiVersion": "v1",
+  "endpoints": {
+    "login": "/api/v1/Usuario/login",
+    "register": "/api/v1/Usuario/register",
+    "products": "/api/v1/Product",
+    "orders": "/api/v1/Order",
+    "cart": "/api/v1/ShoppingCart"
+  },
+  "ssl": {
+    "verify": false
+  },
+  "timeout": "30s"
+}

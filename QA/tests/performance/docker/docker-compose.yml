@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  k6:
+    image: grafana/k6:latest
+    volumes:
+      - ../:/app
+    working_dir: /app
+    environment:
+      - BASE_URL=https://host.docker.internal:5001
+    command: run scenarios/auth/login-rate-limit.js
+    depends_on:
+      - influxdb
+      - grafana
+
+  influxdb:
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
+volumes:
+  influxdb-storage:
+  grafana-storage:

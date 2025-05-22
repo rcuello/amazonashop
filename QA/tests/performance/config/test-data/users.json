@@ -1,0 +1,31 @@
+{
+  "validUsers": [
+    {
+      "email": "jhon.wick@gmail.com",
+      "password": "Pa$$word.Admin.1234.$",
+      "role": "ADMIN"
+    },
+    {
+      "email": "userbot01@gmail.com",
+      "password": "Password1234567$",
+      "role": "USER"
+    },
+    {
+      "email": "userbot02@gmail.com",
+      "password": "Password123456$",
+      "role": "USER"
+    }
+
+  ],
+  "invalidUsers": [
+    {
+      "email": "invalid@example.com",
+      "password": "wrongpassword"
+    }
+  ],
+  "rateLimitTestUsers": {
+    "count": 100,
+    "emailPattern": "ratetest{index}@example.com",
+    "password": "RateTest123!"
+  }
+}
