@@ -25,7 +25,8 @@ export const login = createAsyncThunk(
 
       return data;
     } catch (error) {
-      return rejectWithValue(`Errores: ${error.response.data.message}`);
+      const responseError = error.response.data;
+      return rejectWithValue(responseError.message);
     }
   }
 );
@@ -53,6 +54,7 @@ export const register = createAsyncThunk(
 
         return data;
       } catch (error) {
+        
         return rejectWithValue(`Errores: ${error.response.data.message}`);
       }
     }
