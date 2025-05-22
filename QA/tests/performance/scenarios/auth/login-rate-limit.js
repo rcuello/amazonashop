@@ -32,6 +32,9 @@ export const authTokenValidation = new Rate("auth_token_validation_rate");
 export const blockedRequests = new Counter("blocked_requests");
 export const unauthorizedRequests = new Counter("unauthorized_requests");
 
+// === MÉTRICAS PARA ERRORES ADICIONALES ===
+export const serverErrors = new Counter("server_errors_5xx");
+
 // === OPCIONES DE K6 ===
 export const options = {
   // Stages desde la configuración del ambiente con fallback
@@ -73,7 +76,7 @@ export default function () {
       return acceptableStatuses.includes(r.status);
     },
     "response time is acceptable": (r) => {
-      const maxTime = config.rateLimitTest?.maxResponseTime || 1000;
+      const maxTime = scenarioConfig.settings.maxResponseTime || 1000;
       return r.timings.duration < maxTime;
     },
     "response has body": (r) => r.body && r.body.length > 0,
@@ -105,7 +108,16 @@ export default function () {
 
 // === FUNCIONES HELPER ===
 function updateLoginMetrics(user, response, checksResult, debugMode = false) {
-  switch (response.status) {
+  const statusCode = response.status;
+  //const isSuccessful = statusCode >= 200 && statusCode < 300;
+  //const isClientError = statusCode >= 400 && statusCode < 500;
+  const isServerError = statusCode >= 500 && statusCode < 600;
+
+  if(isServerError){
+    serverErrors.add(1);
+  }
+
+  switch (statusCode) {
     case 200:
       if (checksResult) successfulLogins.add(1);
       break;
