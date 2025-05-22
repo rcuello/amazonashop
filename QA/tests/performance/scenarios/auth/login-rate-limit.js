@@ -4,11 +4,11 @@ import { Logger } from "../../utils/logger.js";
 import { ConfigLoader } from "../../utils/configLoader.js";
 import { UserManager } from "../../utils/userManager.js";
 import { HttpClient } from "../../utils/httpClient.js";
+import { StagePresets } from "../../utils/stagePresets.js";
 
 // === CONFIGURACIÓN ===
 const ENVIRONMENT = __ENV.ENVIRONMENT || "local";
 const logger = new Logger(ENVIRONMENT);
-
 
 // Cargar configuración
 const configLoader = new ConfigLoader(ENVIRONMENT);
@@ -19,17 +19,12 @@ const scenarioConfig = configLoader.loadScenarioConfig("login", "rate_limit");
 const userManager = new UserManager(config.users);
 const httpClient = new HttpClient(config);
 
+logger.info(`🌍 Ambiente: ${ENVIRONMENT}`);
+
 // Logging condicional para debugging
-const debugMode = __ENV.DEBUG === "true" || config.debug === true;
+const isDebugMode = __ENV.DEBUG === "true" || config.debug === true;
 
-// Ruta relativa desde la raíz del proyecto (donde se ejecuta k6)
-const CONFIG_BASE_PATH = `../../config/environments/${ENVIRONMENT}`;
-
-logger.info(`🌍 Ambiente detectado: ${ENVIRONMENT}`);
-logger.info(`📁 Ruta de configuración: ${CONFIG_BASE_PATH}`);
-
-
-// Métricas personalizadas
+// === MÉTRICAS ESPECÍFICAS ===
 export const rateLimitErrors = new Counter("rate_limit_errors");
 export const successfulLogins = new Counter("successful_logins");
 export const loginDuration = new Trend("login_duration");
@@ -40,7 +35,7 @@ export const unauthorizedRequests = new Counter("unauthorized_requests");
 // === OPCIONES DE K6 ===
 export const options = {
   // Stages desde la configuración del ambiente con fallback
-  stages: scenarioConfig.settings.stages,
+  stages: scenarioConfig.settings.stages || StagePresets.RATE_LIMIT,
 
   // Thresholds desde la configuración del ambiente
   thresholds: scenarioConfig.thresholds,
@@ -56,13 +51,12 @@ export const options = {
   },
 };
 
-
-// Función principal de prueba
+// === FUNCIÓN PRINCIPAL ===
 export default function () {
-  // Seleccionar usuario aleatorio
   const user = userManager.getRandomUser();
   const loginEndpoint = config.endpoints?.login || "/api/v1/Usuario/login";
 
+  // Realizar login con medición de tiempo
   const startTime = Date.now();
   const response = httpClient.post(loginEndpoint, {
     email: user.email,
@@ -70,7 +64,6 @@ export default function () {
   });
   const endTime = Date.now();
 
-  // Agregar duración personalizada
   loginDuration.add(endTime - startTime);
 
   // Validaciones dinámicas basadas en configuración
@@ -101,12 +94,20 @@ export default function () {
 
   const checksResult = check(response, validations);
 
-  // Métricas específicas por código de respuesta
+  // Actualizar métricas específicas
+  updateLoginMetrics(user, response, checksResult, isDebugMode);
+
+  // Tiempo de espera configurable por ambiente
+  const sleepTime = config?.sleepTime || 1;
+
+  sleep(sleepTime);
+}
+
+// === FUNCIONES HELPER ===
+function updateLoginMetrics(user, response, checksResult, debugMode = false) {
   switch (response.status) {
     case 200:
-      if (checksResult) {
-        successfulLogins.add(1);
-      }
+      if (checksResult) successfulLogins.add(1);
       break;
     case 429:
       rateLimitErrors.add(1);
@@ -119,16 +120,9 @@ export default function () {
   }
 
   // Validación del token de autenticación para métricas
-  let hasValidToken = false;
-  if (response.status === 200) {
-    try {
-      const tokenField = config.authTokenField || "token";
-      const jsonResponse = response.json();
-      hasValidToken = jsonResponse && jsonResponse[tokenField] !== undefined;
-    } catch (error) {
-      hasValidToken = false;
-    }
-  }
+  const responseToken = getAuthToken(response);
+  const hasValidToken = responseToken !== null;
+
   authTokenValidation.add(hasValidToken);
 
   if (debugMode || response.status >= 400) {
@@ -146,16 +140,24 @@ export default function () {
       //logger.debug(`[ERROR] Response body: ${response.body}`);
     }
   }
+}
 
-  // Tiempo de espera configurable por ambiente
-  const sleepTime = config?.sleepTime || 1;
-  sleep(sleepTime);
+function getAuthToken(response) {
+  try {
+    const tokenField = config.authTokenField || "token";
+    const jsonResponse = response.json();
+    return jsonResponse && jsonResponse[tokenField] !== undefined
+      ? jsonResponse[tokenField]
+      : null;
+  } catch (error) {
+    return null;
+  }
 }
 
 // Función de setup (ejecutada una vez al inicio)
 export function setup() {
   logger.info("🚀 Iniciando pruebas de Rate Limit para Login");
-  logger.separator();  
+  logger.separator();
   logger.info(`Endpoint: ${config.baseUrl}${config.endpoints?.login}`);
   logger.info(`Usuarios: ${userManager.getUserCount()}`);
   logger.info(`Stages: ${options.stages.length}`);
@@ -171,11 +173,11 @@ export function setup() {
 
 // Función de teardown (ejecutada una vez al final)
 export function teardown(data) {
-  logger.info('✅ Pruebas completadas');
+  logger.info("✅ Pruebas completadas");
   logger.separator();
-  logger.info(`🌍 Ambiente: ${data.environment}`);    
-  logger.info(`👥 Usuarios: ${data.userCount}`);    
-  logger.info(`⏱️ Duración: ${data.startTime} - ${new Date().toISOString()}`);  
+  logger.info(`🌍 Ambiente: ${data.environment}`);
+  logger.info(`👥 Usuarios: ${data.userCount}`);
+  logger.info(`⏱️ Duración: ${data.startTime} - ${new Date().toISOString()}`);
   logger.separator();
 }
 
