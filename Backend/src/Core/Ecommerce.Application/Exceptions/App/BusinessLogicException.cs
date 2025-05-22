@@ -2,12 +2,12 @@
 
 namespace Ecommerce.Application.Exceptions.App
 {
-    public class ApplicationException : ApplicationExceptionBase
+    public class BusinessLogicException : ApplicationExceptionBase
     {
-        public ApplicationException(string message)
+        public BusinessLogicException(string message)
             : base(message, HttpStatusCode.InternalServerError) { }
 
-        public ApplicationException(string message, Exception innerException)
+        public BusinessLogicException(string message, Exception innerException)
             : base(message, innerException, HttpStatusCode.InternalServerError) { }
     }
 }

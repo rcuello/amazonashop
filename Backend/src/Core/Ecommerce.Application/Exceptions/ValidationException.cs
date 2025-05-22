@@ -1,8 +1,9 @@
+using Ecommerce.Application.Exceptions.App;
 using FluentValidation.Results;
 
 namespace Ecommerce.Application.Exceptions;
 
-public class ValidationException : ApplicationException
+public class ValidationException : ApplicationExceptionBase
 {
     public IDictionary<string, string[]> Errors {get;}
 

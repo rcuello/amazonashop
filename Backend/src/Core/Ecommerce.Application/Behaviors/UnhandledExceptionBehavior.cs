@@ -57,7 +57,7 @@ public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior
         {
             var requestName = typeof(TRequest).Name;
             _logger.LogError(ex, "Application Exception for request {Name} {@Request}: {Message}", requestName, request, ex.Message);
-            throw new Exceptions.App.ApplicationException("Ocurrió un error procesando su solicitud.", ex);
+            throw new Exceptions.App.BusinessLogicException("Ocurrió un error procesando su solicitud.", ex);
         }
 
 
