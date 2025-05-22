@@ -13,21 +13,16 @@ import Profile from "./components/security/Profile";
 import ProtectedRoute from "./components/route/ProtectedRoute";
 import { loadUser } from "./actions/userAction";
 
-
 function App() {
-
   const dispatch = useDispatch();
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    
     dispatch(getCategories({}));
 
-     if(token)
-    {
+    if (token) {
       dispatch(loadUser({}));
     }
-
   }, [dispatch, token]);
 
   return (
@@ -42,10 +37,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route exact path="/me" element={<ProtectedRoute />}>
-                <Route path="/me" element={<Profile />} />
-              </Route>
+              <Route path="/me" element={<Profile />} />
+            </Route>
           </Routes>
-          
         </div>
 
         <Footer />
