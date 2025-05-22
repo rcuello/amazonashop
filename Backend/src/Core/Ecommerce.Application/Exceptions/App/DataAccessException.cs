@@ -1,8 +1,13 @@
-﻿namespace Ecommerce.Application.Exceptions.App
+﻿using System.Net;
+
+namespace Ecommerce.Application.Exceptions.App
 {
-    public class DataAccessException : ApplicationException
+    public class DataAccessException : ApplicationExceptionBase
     {
-        public DataAccessException(string message) : base(message) { }
-        public DataAccessException(string message, Exception innerException) : base(message, innerException) { }
+        public DataAccessException(string message)
+            : base(message, HttpStatusCode.InternalServerError) { }
+
+        public DataAccessException(string message, Exception innerException)
+            : base(message, innerException, HttpStatusCode.InternalServerError) { }
     }
 }

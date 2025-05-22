@@ -1,8 +1,13 @@
-﻿namespace Ecommerce.Application.Exceptions.App
+﻿using System.Net;
+
+namespace Ecommerce.Application.Exceptions.App
 {
-    public class DatabaseConnectionException : ApplicationException
+    public class DatabaseConnectionException : ApplicationExceptionBase
     {
-        public DatabaseConnectionException(string message) : base(message) { }
-        public DatabaseConnectionException(string message, Exception innerException) : base(message, innerException) { }
+        public DatabaseConnectionException(string message)
+            : base(message, HttpStatusCode.ServiceUnavailable) { }
+
+        public DatabaseConnectionException(string message, Exception innerException)
+            : base(message, innerException, HttpStatusCode.ServiceUnavailable) { }
     }
 }

@@ -1,3 +1,4 @@
+using Ecommerce.Application.Exceptions;
 using Ecommerce.Application.Exceptions.App;
 using MediatR;
 using Microsoft.Data.SqlClient;
@@ -41,6 +42,16 @@ public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior
             _logger.LogError(dbEx, "Database Exception for request {Name} {@Request}: {Message}", requestName, request, dbEx.Message);
             throw new DataAccessException(
                     "Ocurrió un error en la operación de base de datos. Por favor, intente más tarde.", dbEx);
+        }
+        catch (ApplicationExceptionBase)
+        {
+            // Re-lanzar sin modificar para que llegue al middleware con su StatusCode
+            throw;
+        }        
+        catch (FluentValidation.ValidationException)
+        {
+            // Re-lanzar sin modificar para que llegue al middleware
+            throw;
         }
         catch (Exception ex)
         {
