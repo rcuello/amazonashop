@@ -1,4 +1,3 @@
-using Ecommerce.Application.Exceptions;
 using Ecommerce.Application.Exceptions.App;
 using MediatR;
 using Microsoft.Data.SqlClient;

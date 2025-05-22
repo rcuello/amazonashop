@@ -1,5 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
@@ -17,12 +19,30 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Service registration
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
+
+// ===== CONFIGURACIÓN DE CACHE =====
+// 1. Memory Cache (para datos frecuentemente accedidos y de corta duración)
+builder.Services.AddMemoryCache(options =>
+{
+    // OPCIÓN A: Sin SizeLimit (no requerirá Size en cada entrada)
+    options.SizeLimit = null; // Comentar o eliminar SizeLimit
+
+    // OPCIÓN B: Con SizeLimit (requerirá Size en cada entrada)
+    // Sino es especificado probablemente se lance el error:
+    // System.InvalidOperationException: 'Cache entry must specify a value for Size when SizeLimit is set.'
+    //options.SizeLimit = 1024; // Límite de entradas en caché
+
+    options.CompactionPercentage = 0.25; // 25% de compactación cuando se alcanza el límite
+    options.ExpirationScanFrequency = TimeSpan.FromMinutes(5); // Escaneo cada 5 minutos
+});
+
 
 builder.Services.AddDbContext<EcommerceDbContext>(option =>
 {
@@ -52,7 +72,8 @@ builder.Services.AddDbContext<EcommerceDbContext>(option =>
 
 builder.Services.AddMediatR(typeof(GetProductListQueryHandler).Assembly);
 
-builder.Services.AddScoped<IManageImageService, ManageImageService>();
+// Para la subida de imagenes
+builder.Services.AddScoped<IManageImageService, CloudinaryManageImageService>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -78,6 +99,8 @@ builder.Services.AddSingleton(serviceProvider =>
         PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
     };
 });
+
+
 
 builder.Services.AddControllers(opt =>
 {

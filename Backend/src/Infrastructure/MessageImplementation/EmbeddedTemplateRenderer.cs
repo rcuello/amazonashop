@@ -31,15 +31,7 @@ namespace Ecommerce.Infrastructure.MessageImplementation
             _options = options?.Value ?? new TemplateRendererOptions();
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            // Crear una nueva instancia de MemoryCache con opciones explícitas
-            var memoryCacheOptions = new MemoryCacheOptions
-            {
-                // Establecer SizeLimit en null si no quieres limitar el tamaño
-                // O establecer un valor adecuado para tu caso de uso
-                SizeLimit = null
-            };
-
-            _templateCache = memoryCache ?? new MemoryCache(memoryCacheOptions);
+            _templateCache = memoryCache;
             _compilationLock = new SemaphoreSlim(_options.MaxConcurrentCompilations, _options.MaxConcurrentCompilations);
 
             // Obtener la información de la asamblea que contiene los recursos
