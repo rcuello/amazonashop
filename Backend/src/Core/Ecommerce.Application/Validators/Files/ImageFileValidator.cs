@@ -5,43 +5,42 @@ namespace Ecommerce.Application.Validators.Files
 {
     public class ImageFileValidator : AbstractValidator<IFormFile>
     {
-        private readonly string[] _allowedExtensions;
-        private readonly string[] _allowedContentTypes;
+        private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        private static readonly string[] AllowedContentTypes = {
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/gif",
+            "image/webp"
+        };
+        private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
 
-        public ImageFileValidator(string[] allowedExtensions, string[] allowedContentTypes)
+        public ImageFileValidator()
         {
-            _allowedExtensions = allowedExtensions;
-            _allowedContentTypes = allowedContentTypes;
-
             // Validación básica
             RuleFor(file => file)
                 .NotNull().WithMessage("El archivo no puede ser nulo");
 
             RuleFor(file => file.Length)
                 .GreaterThan(0).WithMessage("El archivo no puede estar vacío")
-                .LessThanOrEqualTo(10 * 1024 * 1024).WithMessage("El tamaño del archivo no puede exceder los 10MB");
+                .LessThanOrEqualTo(MaxFileSize).WithMessage("El tamaño del archivo no puede exceder los 10MB");
 
             RuleFor(file => file.FileName)
                 .Must(ValidateFileExtension)
-                .WithMessage($"La extensión del archivo debe ser alguna de las siguientes: {string.Join(", ", allowedExtensions)}");
+                .WithMessage($"La extensión del archivo debe ser alguna de las siguientes: {string.Join(", ", AllowedExtensions)}");
 
             RuleFor(file => file.ContentType)
-                .Must(contentType => allowedContentTypes.Contains(contentType.ToLower()))
-                .WithMessage($"El tipo de archivo debe ser alguno de los siguientes: {string.Join(", ", allowedContentTypes)}");
-
-            // Validación avanzada usando los magic bytes
-            /*RuleFor(file => file)
-                .MustBeValidImage()
-                .WithMessage("El archivo no es una imagen válida. Por favor, sube un archivo de imagen real.");*/
+                .Must(contentType => AllowedContentTypes.Contains(contentType.ToLower()))
+                .WithMessage($"El tipo de archivo debe ser alguno de los siguientes: {string.Join(", ", AllowedContentTypes)}");
         }
 
-        private bool ValidateFileExtension(string fileName)
+        private static bool ValidateFileExtension(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
                 return false;
 
             string extension = Path.GetExtension(fileName).ToLowerInvariant();
-            return _allowedExtensions.Contains(extension);
+            return AllowedExtensions.Contains(extension);
         }
     }
 }

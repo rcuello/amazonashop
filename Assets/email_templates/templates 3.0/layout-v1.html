@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazonas</title>
+    <style>
+        /* Reset styles for email clients */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* Main styles */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        
+        .header {
+            background-color: #232f3e;
+            padding: 20px;
+            text-align: left;
+        }
+        
+        .logo {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logo-accent {
+            color: #ff9900;
+        }
+        
+        .content {
+            padding: 40px 30px;
+            background-color: #ffffff;
+        }
+        
+        .greeting {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: #ff9900;
+            color: #ffffff !important;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .button:hover {
+            background-color: #e68a00;
+        }
+        
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #ff9900;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            background-color: #232f3e;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .footer a {
+            color: #ff9900;
+            text-decoration: none;
+        }
+        
+        .social-links {
+            margin: 20px 0;
+        }
+        
+        .social-links a {
+            color: #ff9900;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            .content {
+                padding: 20px !important;
+            }
+            .header {
+                padding: 15px !important;
+            }
+            .logo {
+                font-size: 24px !important;
+            }
+            .greeting {
+                font-size: 20px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td>
+                <div class="email-container">
+                    <!-- Header -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="header">
+                                <a href="#" class="logo">amazonas<span class="logo-accent">.</span></a>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Content -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="content">
+                                <h1 class="greeting">¡Hola [NOMBRE_USUARIO]!</h1>
+                                
+                                <p class="message">
+                                    [MENSAJE_PRINCIPAL] - Este es el contenido principal del correo que se personalizará según el tipo de notificación (registro, cambio de contraseña, confirmación de pedido, etc.).
+                                </p>
+                                
+                                <!-- Action Button -->
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                    <tr>
+                                        <td>
+                                            <a href="[ENLACE_ACCION]" class="button">[TEXTO_BOTON]</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Info Box (opcional) -->
+                                <div class="info-box">
+                                    <strong>Información importante:</strong><br>
+                                    [INFORMACION_ADICIONAL] - Aquí puedes incluir detalles específicos, códigos de verificación, instrucciones especiales, etc.
+                                </div>
+                                
+                                <p class="message">
+                                    Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos. Nuestro equipo de soporte está aquí para ayudarte.
+                                </p>
+                                
+                                <p class="message">
+                                    Gracias por confiar en Amazonas.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Footer -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="footer">
+                                <div class="social-links">
+                                    <a href="#">Facebook</a> |
+                                    <a href="#">Twitter</a> |
+                                    <a href="#">Instagram</a> |
+                                    <a href="#">LinkedIn</a>
+                                </div>
+                                
+                                <p>
+                                    © 2025 Amazonas. Todos los derechos reservados.<br>
+                                    Dirección de la empresa, Ciudad, País<br>
+                                    <a href="[ENLACE_CANCELAR_SUSCRIPCION]">Cancelar suscripción</a> | 
+                                    <a href="[ENLACE_POLITICA_PRIVACIDAD]">Política de Privacidad</a>
+                                </p>
+                                
+                                <p style="font-size: 12px; color: #cccccc; margin-top: 20px;">
+                                    Este correo fue enviado a [EMAIL_USUARIO]. Si no solicitaste esta información, 
+                                    puedes ignorar este mensaje de forma segura.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

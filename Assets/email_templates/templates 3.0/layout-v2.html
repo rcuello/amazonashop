@@ -1,0 +1,1090 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Template - Componentes de Email</title>
+    <style>
+        /* =================================================
+           RESET STYLES - Para compatibilidad con clientes de email
+           ================================================= */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            max-width: 100%;
+        }
+        
+        /* =================================================
+           ESTILOS BASE
+           ================================================= */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f4f4f4;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        /* =================================================
+           COMPONENTE: HEADER
+           ================================================= */
+        .header {
+            background: linear-gradient(135deg, #232f3e 0%, #394a5f 100%);
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .header-simple {
+            background-color: #232f3e;
+            padding: 20px;
+            text-align: left;
+        }
+        
+        .logo {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .logo-accent {
+            color: #ff9900;
+        }
+        
+        .header-subtitle {
+            color: #ffffff;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        /* =================================================
+           COMPONENTE: NAVEGACIÓN
+           ================================================= */
+        .nav-bar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 0;
+            text-align: center;
+        }
+        
+        .nav-link {
+            display: inline-block;
+            margin: 0 20px;
+            color: #333333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: #f8f9fa;
+            color: #ff9900;
+        }
+        
+        /* =================================================
+           COMPONENTE: HERO SECTION
+           ================================================= */
+        .hero-section {
+            background: linear-gradient(135deg, #ff9900 0%, #ffb347 100%);
+            color: #ffffff;
+            padding: 60px 30px;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        /* =================================================
+           COMPONENTE: CONTENIDO PRINCIPAL
+           ================================================= */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .content-wide {
+            padding: 60px 40px;
+        }
+        
+        .content-narrow {
+            padding: 30px 20px;
+        }
+        
+        /* =================================================
+           COMPONENTE: TÍTULOS Y TEXTO
+           ================================================= */
+        .heading-xl {
+            font-size: 32px;
+            color: #333333;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .heading-lg {
+            font-size: 28px;
+            color: #333333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .heading-md {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        
+        .heading-sm {
+            font-size: 20px;
+            color: #333333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .text-body {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .text-small {
+            font-size: 14px;
+            color: #888888;
+            line-height: 1.5;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-left {
+            text-align: left;
+        }
+        
+        /* =================================================
+           COMPONENTE: BOTONES
+           ================================================= */
+        .button-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff9900 0%, #e68a00 100%);
+            color: #ffffff !important;
+            padding: 18px 35px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 5px;
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .button-secondary {
+            display: inline-block;
+            background-color: transparent;
+            color: #ff9900 !important;
+            border: 2px solid #ff9900;
+            padding: 16px 33px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 5px;
+        }
+        
+        .button-success {
+            display: inline-block;
+            background-color: #28a745;
+            color: #ffffff !important;
+            padding: 18px 35px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 5px;
+        }
+        
+        .button-danger {
+            display: inline-block;
+            background-color: #dc3545;
+            color: #ffffff !important;
+            padding: 18px 35px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 5px;
+        }
+        
+        .button-small {
+            padding: 12px 25px;
+            font-size: 14px;
+        }
+        
+        .button-large {
+            padding: 22px 45px;
+            font-size: 18px;
+        }
+        
+        /* =================================================
+           COMPONENTE: CAJAS DE CONTENIDO
+           ================================================= */
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #ff9900;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .success-box {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .danger-box {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .code-box {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* =================================================
+           COMPONENTE: ICONOS SVG
+           ================================================= */
+        .icon-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .icon-large {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .icon-medium {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .icon-small {
+            width: 40px;
+            height: 40px;
+        }
+        
+        /* =================================================
+           COMPONENTE: GRILLAS Y COLUMNAS
+           ================================================= */
+        .grid-container {
+            display: table;
+            width: 100%;
+            margin: 30px 0;
+        }
+        
+        .grid-item-2 {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+            padding: 20px 15px;
+        }
+        
+        .grid-item-3 {
+            display: table-cell;
+            width: 33.33%;
+            vertical-align: top;
+            padding: 20px 10px;
+            text-align: center;
+        }
+        
+        .grid-item-4 {
+            display: table-cell;
+            width: 25%;
+            vertical-align: top;
+            padding: 20px 8px;
+            text-align: center;
+        }
+        
+        /* =================================================
+           COMPONENTE: TARJETAS
+           ================================================= */
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333333;
+            margin: 0;
+        }
+        
+        /* =================================================
+           COMPONENTE: ESTADÍSTICAS
+           ================================================= */
+        .stats-container {
+            display: table;
+            width: 100%;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px 0;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            display: table-cell;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff9900;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* =================================================
+           COMPONENTE: LISTA DE PASOS
+           ================================================= */
+        .steps-container {
+            background-color: #f8f9fa;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 10px;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        
+        .step-number {
+            background-color: #ff9900;
+            color: #ffffff;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 5px;
+        }
+        
+        .step-description {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.5;
+        }
+        
+        /* =================================================
+           COMPONENTE: BANNERS PROMOCIONALES
+           ================================================= */
+        .promo-banner {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: #ffffff;
+            padding: 40px 30px;
+            margin: 30px 0;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .promo-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .promo-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .promo-code {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin: 15px 0;
+        }
+        
+        /* =================================================
+           COMPONENTE: TESTIMONIOS
+           ================================================= */
+        .testimonial {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .testimonial-quote {
+            font-size: 18px;
+            font-style: italic;
+            color: #555555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .testimonial-author {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333333;
+        }
+        
+        .testimonial-role {
+            font-size: 14px;
+            color: #888888;
+            margin-top: 5px;
+        }
+        
+        .stars {
+            color: #ffc107;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        /* =================================================
+           COMPONENTE: FOOTER
+           ================================================= */
+        .footer {
+            background-color: #232f3e;
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer a {
+            color: #ff9900;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .social-links {
+            margin: 25px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 15px;
+            color: #ff9900;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 153, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            line-height: 20px;
+        }
+        
+        .footer-links {
+            margin: 20px 0;
+            border-top: 1px solid #394a5f;
+            padding-top: 20px;
+        }
+        
+        .footer-links a {
+            margin: 0 10px;
+            font-size: 13px;
+        }
+        
+        /* =================================================
+           COMPONENTE: DIVIDERS
+           ================================================= */
+        .divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 40px 0;
+        }
+        
+        .divider-thick {
+            height: 3px;
+            background: linear-gradient(90deg, #ff9900 0%, #e68a00 100%);
+            margin: 50px 0;
+            border-radius: 2px;
+        }
+        
+        .spacer-sm {
+            height: 20px;
+        }
+        
+        .spacer-md {
+            height: 40px;
+        }
+        
+        .spacer-lg {
+            height: 60px;
+        }
+        
+        /* =================================================
+           RESPONSIVE DESIGN
+           ================================================= */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            
+            .content, .content-wide {
+                padding: 30px 20px !important;
+            }
+            
+            .content-narrow {
+                padding: 20px 15px !important;
+            }
+            
+            .header, .hero-section {
+                padding: 30px 20px !important;
+            }
+            
+            .heading-xl {
+                font-size: 28px !important;
+            }
+            
+            .heading-lg {
+                font-size: 24px !important;
+            }
+            
+            .hero-title {
+                font-size: 28px !important;
+            }
+            
+            .grid-container {
+                display: block !important;
+            }
+            
+            .grid-item-2, .grid-item-3, .grid-item-4 {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 30px;
+            }
+            
+            .stats-container {
+                display: block !important;
+            }
+            
+            .stat-item {
+                display: block !important;
+                margin: 20px 0;
+            }
+            
+            .step-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-number {
+                margin: 0 0 15px 0;
+            }
+            
+            .nav-link {
+                display: block;
+                margin: 5px 0;
+            }
+            
+            .social-links a {
+                margin: 5px;
+            }
+            
+            .button-primary, .button-secondary {
+                display: block !important;
+                margin: 15px 0 !important;
+                text-align: center;
+            }
+        }
+        
+        /* =================================================
+           DARK MODE SUPPORT (Opcional)
+           ================================================= */
+        @media (prefers-color-scheme: dark) {
+            .email-container {
+                background-color: #1a1a1a !important;
+            }
+            
+            .content {
+                background-color: #1a1a1a !important;
+            }
+            
+            .heading-xl, .heading-lg, .heading-md, .heading-sm {
+                color: #ffffff !important;
+            }
+            
+            .text-body {
+                color: #cccccc !important;
+            }
+            
+            .card {
+                background-color: #2a2a2a !important;
+                border-color: #404040 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td>
+                <div class="email-container">
+                    
+                    <!-- EJEMPLO: Header Gradient -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="header">
+                                <a href="#" class="logo">amazonas<span class="logo-accent">.</span></a>
+                                <div class="header-subtitle">Layout Template - Guía de Componentes</div>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- EJEMPLO: Navegación -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="nav-bar">
+                                <a href="#" class="nav-link">Inicio</a>
+                                <a href="#" class="nav-link">Productos</a>
+                                <a href="#" class="nav-link">Ofertas</a>
+                                <a href="#" class="nav-link">Soporte</a>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- EJEMPLO: Hero Section -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="hero-section">
+                                <h1 class="hero-title">Componentes de Email</h1>
+                                <p class="hero-subtitle">Esta es una guía completa con todos los componentes reutilizables</p>
+                                <a href="#" class="button-primary">Explorar Componentes</a>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- EJEMPLO: Contenido Principal -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="content">
+                                
+                                <!-- Títulos -->
+                                <h1 class="heading-xl">Título Extra Grande</h1>
+                                <h2 class="heading-lg">Título Grande</h2>
+                                <h3 class="heading-md">Título Mediano</h3>
+                                <h4 class="heading-sm">Título Pequeño</h4>
+                                
+                                <p class="text-body">
+                                    Este es el texto del cuerpo principal. Tiene un tamaño de fuente de 16px 
+                                    y un interlineado de 1.6 para una mejor legibilidad.
+                                </p>
+                                
+                                <p class="text-small">Este es texto pequeño para notas o información secundaria.</p>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Banner Promocional -->
+                                <div class="promo-banner">
+                                    <div class="promo-title">¡Oferta Especial!</div>
+                                    <div class="promo-subtitle">Obtén 20% de descuento en tu primera compra</div>
+                                    <div class="promo-code">BIENVENIDO20</div>
+                                    <a href="#" class="button-primary" style="background: rgba(255,255,255,0.2); border: 2px solid white;">Usar Código</a>
+                                </div>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Tarjetas -->
+                                <h2 class="heading-lg text-center">Productos Destacados</h2>
+                                
+                                <div class="grid-container">
+                                    <div class="grid-item-2">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Smartphone Pro</h3>
+                                            </div>
+                                            <img src="/api/placeholder/200/150" alt="Smartphone" style="width: 100%; border-radius: 8px; margin-bottom: 15px;">
+                                            <p class="text-body">El último modelo con cámara profesional y batería de larga duración.</p>
+                                            <div class="text-center">
+                                                <span style="font-size: 24px; font-weight: bold; color: #ff9900;">$899</span>
+                                                <span style="text-decoration: line-through; color: #888888; margin-left: 10px;">$1099</span>
+                                            </div>
+                                            <div class="text-center">
+                                                <a href="#" class="button-primary">Ver Detalles</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-item-2">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Laptop Gaming</h3>
+                                            </div>
+                                            <img src="/api/placeholder/200/150" alt="Laptop" style="width: 100%; border-radius: 8px; margin-bottom: 15px;">
+                                            <p class="text-body">Potencia extrema para gaming y trabajo profesional.</p>
+                                            <div class="text-center">
+                                                <span style="font-size: 24px; font-weight: bold; color: #ff9900;">$1299</span>
+                                                <span style="text-decoration: line-through; color: #888888; margin-left: 10px;">$1599</span>
+                                            </div>
+                                            <div class="text-center">
+                                                <a href="#" class="button-primary">Ver Detalles</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Testimonios -->
+                                <h2 class="heading-lg text-center">Lo que Dicen Nuestros Clientes</h2>
+                                
+                                <div class="testimonial">
+                                    <div class="stars">★★★★★</div>
+                                    <div class="testimonial-quote">
+                                        "Excelente servicio y productos de calidad. La entrega fue súper rápida y el empaque perfecto. Definitivamente volveré a comprar."
+                                    </div>
+                                    <div class="testimonial-author">María González</div>
+                                    <div class="testimonial-role">Cliente Verificado</div>
+                                </div>
+                                
+                                <div class="grid-container">
+                                    <div class="grid-item-2">
+                                        <div class="testimonial">
+                                            <div class="stars">★★★★★</div>
+                                            <div class="testimonial-quote">
+                                                "Increíble variedad de productos y precios competitivos."
+                                            </div>
+                                            <div class="testimonial-author">Carlos Ruiz</div>
+                                            <div class="testimonial-role">Cliente Premium</div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-item-2">
+                                        <div class="testimonial">
+                                            <div class="stars">★★★★★</div>
+                                            <div class="testimonial-quote">
+                                                "El mejor servicio al cliente que he experimentado."
+                                            </div>
+                                            <div class="testimonial-author">Ana López</div>
+                                            <div class="testimonial-role">Cliente Frecuente</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="divider-thick"></div>
+                                
+                                <!-- Llamada a la Acción Final -->
+                                <div class="text-center">
+                                    <h2 class="heading-lg">¿Listo para Comenzar?</h2>
+                                    <p class="text-body">Únete a miles de clientes satisfechos y descubre por qué somos la mejor opción.</p>
+                                    <a href="#" class="button-primary button-large">Explorar Catálogo</a>
+                                    <a href="#" class="button-secondary button-large">Crear Cuenta</a>
+                                </div>
+                                
+                                <div class="spacer-lg"></div>
+                                
+                                <!-- Información Adicional -->
+                                <div class="grid-container">
+                                    <div class="grid-item-4">
+                                        <div class="icon-container">
+                                            <svg class="icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="#ff9900"/>
+                                                <circle cx="12" cy="10" r="3" fill="white"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-small text-center"><strong>Envío Gratis</strong><br>En pedidos superiores a $50</p>
+                                    </div>
+                                    <div class="grid-item-4">
+                                        <div class="icon-container">
+                                            <svg class="icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#28a745" stroke-width="2" fill="none"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-small text-center"><strong>Garantía</strong><br>2 años en todos los productos</p>
+                                    </div>
+                                    <div class="grid-item-4">
+                                        <div class="icon-container">
+                                            <svg class="icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" fill="#007bff"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-small text-center"><strong>Soporte 24/7</strong><br>Atención personalizada</p>
+                                    </div>
+                                    <div class="grid-item-4">
+                                        <div class="icon-container">
+                                            <svg class="icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 1v6m0 6v6m6-9h-6m-6 0h6" stroke="#dc3545" stroke-width="2"/>
+                                                <circle cx="12" cy="12" r="10" stroke="#dc3545" stroke-width="2" fill="none"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-small text-center"><strong>Devoluciones</strong><br>30 días sin preguntas</p>
+                                    </div>
+                                </div>
+                                
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- EJEMPLO: Footer -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="footer">
+                                <h3 style="color: #ffffff; margin-bottom: 20px;">amazonas<span style="color: #ff9900;">.</span></h3>
+                                <p>Tu tienda de confianza para productos de tecnología y más.</p>
+                                
+                                <div class="social-links">
+                                    <a href="#" title="Facebook">f</a>
+                                    <a href="#" title="Twitter">t</a>
+                                    <a href="#" title="Instagram">i</a>
+                                    <a href="#" title="LinkedIn">in</a>
+                                </div>
+                                
+                                <div class="footer-links">
+                                    <a href="#">Política de Privacidad</a>
+                                    <a href="#">Términos de Servicio</a>
+                                    <a href="#">Contacto</a>
+                                    <a href="#">Ayuda</a>
+                                </div>
+                                
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #394a5f;">
+                                    <p style="margin: 0; opacity: 0.8;">
+                                        © 2024 Amazonas. Todos los derechos reservados.<br>
+                                        Si no deseas recibir más correos, <a href="#" style="color: #ff9900;">haz clic aquí</a>
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>ider"></div>
+                                
+                                <!-- Botones -->
+                                <div class="text-center">
+                                    <a href="#" class="button-primary">Botón Primario</a>
+                                    <a href="#" class="button-secondary">Botón Secundario</a>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <a href="#" class="button-success">Éxito</a>
+                                    <a href="#" class="button-danger">Peligro</a>
+                                    <a href="#" class="button-primary button-small">Pequeño</a>
+                                    <a href="#" class="button-primary button-large">Grande</a>
+                                </div>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Cajas de Contenido -->
+                                <div class="info-box">
+                                    <strong>Caja de Información:</strong> Ideal para información importante o destacada.
+                                </div>
+                                
+                                <div class="success-box">
+                                    <strong>Caja de Éxito:</strong> Para confirmaciones y mensajes positivos.
+                                </div>
+                                
+                                <div class="warning-box">
+                                    <strong>⚠️ Caja de Advertencia:</strong> Para alertas y información que requiere atención.
+                                </div>
+                                
+                                <div class="danger-box">
+                                    <strong>Caja de Peligro:</strong> Para errores y mensajes críticos.
+                                </div>
+                                
+                                <div class="code-box">
+                                    <strong>Código de Verificación:</strong><br>
+                                    <span style="font-size: 24px; font-weight: bold;">ABC123XYZ</span>
+                                </div>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Iconos -->
+                                <div class="icon-container">
+                                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" fill="#28a745"/>
+                                        <path d="m9 12 2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Grilla de 3 columnas -->
+                                <div class="grid-container">
+                                    <div class="grid-item-3">
+                                        <div class="icon-container">
+                                            <svg class="icon-medium" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10" fill="#ff9900"/>
+                                                <path d="M12 6v6l4 2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="heading-sm">Velocidad</h4>
+                                        <p class="text-small">Entrega rápida en 24 horas o menos</p>
+                                    </div>
+                                    <div class="grid-item-3">
+                                        <div class="icon-container">
+                                            <svg class="icon-medium" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10" fill="#28a745"/>
+                                                <path d="m9 12 2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="heading-sm">Calidad</h4>
+                                        <p class="text-small">Productos verificados y de alta calidad</p>
+                                    </div>
+                                    <div class="grid-item-3">
+                                        <div class="icon-container">
+                                            <svg class="icon-medium" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10" fill="#dc3545"/>
+                                                <path d="M12 8v4M12 16h.01" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="heading-sm">Soporte</h4>
+                                        <p class="text-small">Atención al cliente 24/7</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Estadísticas -->
+                                <div class="stats-container">
+                                    <div class="stat-item">
+                                        <div class="stat-number">150K+</div>
+                                        <div class="stat-label">Clientes Satisfechos</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">500+</div>
+                                        <div class="stat-label">Productos</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">50+</div>
+                                        <div class="stat-label">Países</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="divider"></div>
+                                
+                                <!-- Pasos -->
+                                <h2 class="heading-lg text-center">Cómo Comprar</h2>
+                                <div class="steps-container">
+                                    <div class="step-item">
+                                        <div class="step-number">1</div>
+                                        <div class="step-content">
+                                            <div class="step-title">Explora nuestro catálogo</div>
+                                            <div class="step-description">Navega por miles de productos organizados por categorías</div>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-number">2</div>
+                                        <div class="step-content">
+                                            <div class="step-title">Agrega al carrito</div>
+                                            <div class="step-description">Selecciona los productos que deseas y ajusta las cantidades</div>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-number">3</div>
+                                        <div class="step-content">
+                                            <div class="step-title">Finaliza tu compra</div>
+                                            <div class="step-description">Completa el pago de forma segura y recibe tu pedido</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                

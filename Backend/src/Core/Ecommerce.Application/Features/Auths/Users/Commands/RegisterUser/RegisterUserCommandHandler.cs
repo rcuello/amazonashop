@@ -42,6 +42,11 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
 
     public async Task<AuthResponse> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(request.Email))
+        {
+            throw new BadRequestException("El Email del usuario es requerido");
+        }
+
         var existeUserByEmail = await _userManager.FindByEmailAsync(request.Email!) is null ? false : true;
         if(existeUserByEmail)
         {

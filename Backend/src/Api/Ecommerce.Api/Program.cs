@@ -51,6 +51,7 @@ builder.Services.AddDbContext<EcommerceDbContext>(option =>
 });
 
 builder.Services.AddMediatR(typeof(GetProductListQueryHandler).Assembly);
+
 builder.Services.AddScoped<IManageImageService, ManageImageService>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>

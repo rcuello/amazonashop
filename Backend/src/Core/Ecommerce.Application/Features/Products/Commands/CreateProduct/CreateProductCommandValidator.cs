@@ -32,8 +32,8 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
                 .Must(files => files != null && files.All(f => f.Length > 0 && f.Length <= MaxFileSize))
                 .WithMessage($"Las imágenes no pueden estar vacías y deben ser menores a {MaxFileSizeMb}MB");
 
-            RuleForEach(p => p.Fotos)
-                .SetValidator(new ImageFileValidator(_allowedExtensions, _allowedContentTypes));
+            //RuleForEach(p => p.Fotos)
+            //    .SetValidator(new ImageFileValidator(_allowedExtensions, _allowedContentTypes));
         });
 
     }

@@ -1,0 +1,367 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Bienvenido a Amazonas!</title>
+    <style>
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #232f3e 0%, #394a5f 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .logo-accent {
+            color: #ff9900;
+        }
+        
+        .header-subtitle {
+            color: #ffffff;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 50px 30px;
+            background-color: #ffffff;
+        }
+        
+        .welcome-icon {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-icon svg {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .greeting {
+            font-size: 28px;
+            color: #333333;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .welcome-message {
+            font-size: 18px;
+            color: #555555;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .button-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff9900 0%, #e68a00 100%);
+            color: #ffffff !important;
+            padding: 20px 40px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 6px 20px rgba(255, 153, 0, 0.3);
+        }
+        
+        .features-grid {
+            display: table;
+            width: 100%;
+            margin: 40px 0;
+        }
+        
+        .feature-item {
+            display: table-cell;
+            width: 33.33%;
+            vertical-align: top;
+            padding: 20px 15px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background-color: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 10px;
+        }
+        
+        .feature-desc {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.4;
+        }
+        
+        .promo-banner {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: #ffffff;
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .promo-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .promo-code {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 15px 0;
+        }
+        
+        .steps-container {
+            background-color: #f8f9fa;
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 10px;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            background-color: #ff9900;
+            color: #ffffff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            font-size: 16px;
+            color: #333333;
+        }
+        
+        .social-proof {
+            text-align: center;
+            padding: 30px;
+            background-color: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .stats-container {
+            display: table;
+            width: 100%;
+        }
+        
+        .stat-item {
+            display: table-cell;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff9900;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666666;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            background-color: #232f3e;
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .footer a {
+            color: #ff9900;
+            text-decoration: none;
+        }
+        
+        .social-links {
+            margin: 30px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 15px;
+            color: #ff9900;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            .content {
+                padding: 30px 20px !important;
+            }
+            .features-grid {
+                display: block !important;
+            }
+            .feature-item {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 30px;
+            }
+            .stats-container {
+                display: block !important;
+            }
+            .stat-item {
+                display: block !important;
+                margin: 20px 0;
+            }
+            .step-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .step-number {
+                margin: 0 0 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td>
+                <div class="email-container">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="header">
+                                <a href="#" class="logo">amazonas<span class="logo-accent">.</span></a>
+                                <div class="header-subtitle">Tu nuevo marketplace favorito</div>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                            <td class="content">
+                                <div class="welcome-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" fill="#28a745"/>
+                                        <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="9" y1="9" x2="9.01" y2="9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="15" y1="9" x2="15.01" y2="9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                
+                                <h1 class="greeting">¡Bienvenido a Amazonas, [NOMBRE_USUARIO]!</h1>
+                                
+                                <p class="welcome-message">
+                                    Nos alegra tenerte con nosotros. Ahora tienes acceso a miles de productos 
+                                    con la mejor calidad y los precios más competitivos del mercado.
+                                </p>
+                                
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="text-align: center;">
+                                    <tr>
+                                        <td>
+                                            <a href="[ENLACE_EXPLORAR]" class="button-primary">Explorar Productos</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <div class="promo-banner">
+                                    <div class="promo-title">🎉 ¡Oferta de Bienvenida!</div>
+                                    <p>Obtén un 20% de descuento en tu primera compra</p>
+                                    <div class="promo-code">BIENVENIDO20</div>
+                                    <p style="font-size: 14px; opacity: 0.9;">Válido por 30 días</p>
+                                </div>
+                                
+                                <div class="features-grid">
+                                    <div class="feature-item">
+                                        <div class="feature-icon">🚚</div>
+                                        <div class="feature-title">Envío Gratis</div>
+                                        <div class="feature-desc">En compras mayores a $50</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <div class="feature-icon">🔒</div>
+                                        <div class="feature-title">Pago Seguro</div>
+                                        <div class="feature-desc">Protección garantizada</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <div class="feature-icon">⭐</div>
+                                        <div class="feature-title">Calidad Premium</div>
+                                        <div class="feature-desc">Productos verificados</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="steps-container">
+                                    <h3 style="text-align: center; color: #333333; margin-bottom: 30px;">Cómo empezar:</h3>
+                                    <div class="step-item">
+                                        <div class="step-number">1</div>
+                                        <div class="step-text">Completa tu perfil y añade una dirección de envío</div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-number">2</div>
+                                        <div class="step-text">Explora nuestras categor
