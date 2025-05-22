@@ -2,6 +2,7 @@
   "baseUrl": "https://localhost:5001",
   "debug": true,
   "authTokenField": "token",
+  "sleepTime":1,
   "endpoints": {
     "login": "/api/v1/Usuario/login",
     "register": "/api/v1/Usuario/register",
