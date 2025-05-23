@@ -1,114 +1,170 @@
-using Ecommerce.Api.Extensions.ServiceCollection;
+﻿using Ecommerce.Api.Extensions.ServiceCollection;
 using Ecommerce.Api.Extensions.ServiceCollection.ApplicationBuilder;
 
+// =====================================================================================
+// INICIALIZACIÓN DEL BUILDER
+// =====================================================================================
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = builder.Environment.IsDevelopmentOrLocal();
 
-// ===== CONFIGURACI�N DE ARCHIVOS DE CONFIGURACI�N =====
+// =====================================================================================
+// CONFIGURACIÓN DE ARCHIVOS DE CONFIGURACIÓN
+// =====================================================================================
+// Carga archivos adicionales de configuración como ratelimiting.json, features.json, etc.
 builder.Configuration.AddCustomConfigurationFiles(builder.Environment);
 // ======================================================
 
-// Service registration
-// ===== CONFIGURACI�N DE Repositories =====
+// =====================================================================================
+// REGISTRO DE SERVICIOS - CAPAS DE ARQUITECTURA
+// =====================================================================================
+
+// ----------------------------------------------------
+// CAPA DE INFRAESTRUCTURA - REPOSITORIOS Y PERSISTENCIA
+// ----------------------------------------------------
+// Configuración del patrón Repository y Unit of Work
 builder.Services.AddCustomRepositoryServices();
+
+// ----------------------------------------------------
+// SERVICIOS DE INFRAESTRUCTURA EXTERNA
+// ----------------------------------------------------
+// Servicios de correo electrónico (SendGrid, Mailtrap)
 builder.Services.AddCustomEmailService(builder.Configuration);
+
+// Servicios de gestión de imágenes (Cloudinary)
 builder.Services.AddCustomImageService(builder.Configuration);
+
+// Servicios de pagos (Stripe, PayPal, etc.)
 builder.Services.AddCustomPaymentServices(builder.Configuration);
-// ===== CONFIGURACI�N DE Fluent =====
+
+// =====================================================================================
+// CAPA DE APLICACIÓN - LÓGICA DE NEGOCIO
+// =====================================================================================
+// FluentValidation para validación de comandos y queries
 builder.Services.AddCustomFluentValidation();
-// ===== CONFIGURACI�N DE MediatR (CQRS) =====
+
+// MediatR para implementar Command Query Responsibility Segregation (CQRS)
 builder.Services.AddCustomMediatR();
-// ===== CONFIGURACI�N DE AutoMapper =====
+
+// AutoMapper para transformación entre DTOs y entidades de dominio
 builder.Services.AddCustomAutoMapper();
 
-// ===== CONFIGURACI�N DE RateLimit =====
+// =====================================================================================
+// SERVICIOS DE INFRAESTRUCTURA WEB
+// =====================================================================================
+
+// ----------------------------------------------------
+// CONTROL DE TRÁFICO Y SEGURIDAD
+// ----------------------------------------------------
+
+// Rate Limiting para prevenir abuso de la API
 builder.Services.AddCustomRateLimiting(builder.Configuration);
 
-// ===== CONFIGURACI�N DE CACHE =====
+// ----------------------------------------------------
+// RENDIMIENTO Y CACHE
+// ----------------------------------------------------
+// Memory Cache para optimización de consultas frecuentes
 builder.Services.AddCustomCache();
 
-// ===== CONFIGURACI�N DE Database Context =====
+// ----------------------------------------------------
+// PERSISTENCIA DE DATOS
+// ----------------------------------------------------
+// Entity Framework Core con SQL Server
 builder.Services.AddCustomDbContext(builder.Configuration);
 
-// ===== CONFIGURACI�N DE Json =====
+// ----------------------------------------------------
+// SERIALIZACIÓN Y FORMATO DE DATOS
+// ----------------------------------------------------
+// Configuración JSON para APIs RESTful (camelCase, fechas, etc.)
 builder.Services.AddCustomJson(builder.Environment);
 
-//builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
+// ----------------------------------------------------
+// SERVICIOS DE TIEMPO (REQUERIDO PARA .NET 9)
+// ----------------------------------------------------
+// TimeProvider para funcionalidades dependientes del tiempo
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 
+// ----------------------------------------------------
+// AUTENTICACIÓN Y AUTORIZACIÓN
+// ----------------------------------------------------
+// JWT Bearer Token + ASP.NET Core Identity
 builder.Services.AddCustomAuthentication(builder.Configuration);
 
-// ===== CONFIGURACI�N DE Cors =====
+// ----------------------------------------------------
+// COMUNICACIÓN ENTRE DOMINIOS
+// ----------------------------------------------------
+// CORS para permitir requests desde frontend (React, Angular, etc.)
 builder.Services.AddCustomCors();
 
-// ===== CONFIGURACI�N DE FileUpload =====
+// ----------------------------------------------------
+// GESTIÓN DE ARCHIVOS
+// ----------------------------------------------------
+// Configuración para subida de archivos grandes (imágenes, documentos)
 builder.Services.AddCustomFileUpload();
 
-// ===== CONFIGURACI�N DE OpenApi =====
+// ----------------------------------------------------
+// DOCUMENTACIÓN DE API
+// ----------------------------------------------------
+// OpenAPI/Swagger para documentación interactiva
 builder.Services.AddCustomOpenApi();
 
+
+// =====================================================================================
+// CONSTRUCCIÓN Y CONFIGURACIÓN DE LA APLICACIÓN
+// =====================================================================================
 var app = builder.Build();
 
+// =====================================================================================
+// PIPELINE DE MIDDLEWARES
+// =====================================================================================
+// Configuración del pipeline HTTP en orden específico:
+// 1. HTTPS Redirection
+// 2. Exception Handling
+// 3. Rate Limiting
+// 4. Authentication/Authorization
+// 5. CORS
+// 6. Controllers
 app.UseCustomMiddlewares(isDevelopment);
 
+// =====================================================================================
+// INICIALIZACIÓN DE BASE DE DATOS
+// =====================================================================================
+// Ejecuta migraciones y seed de datos inicial de forma segura
 await app.UseCustomMigrationsAsync();
-/*
-// ===== Uso DE OpenApi =====
-app.UseCustomOpenApi(isDevelopment);
-
-app.UseHttpsRedirection();
-
-app.UseMiddleware<ExceptionMiddleware>();
-
-// Usar Rate Limiting
-app.UseCustomRateLimiter();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseCustomCors();
-
-app.MapControllers();
-*/
 
 
-
-//using (var scope = app.Services.CreateScope())
-//{
-//    var service = scope.ServiceProvider;
-//    var loggerFactory = service.GetRequiredService<ILoggerFactory>();    
-
-//    try
-//    {
-//        var context = service.GetRequiredService<EcommerceDbContext>();
-//        var userManager = service.GetRequiredService<UserManager<Usuario>>();
-//        var roleManager = service.GetRequiredService<RoleManager<IdentityRole>>();
-
-//        logger.LogInformation("Starting Migration ...");
-
-//        //await context.Database.MigrateAsync();
-
-//        //RC: Por ahora Esto crear� la base de datos seg�n el modelo actual, pero no mantendr� las migraciones.
-//        await context.Database.EnsureCreatedAsync();
-
-//        logger.LogDebug("Loading Data ...");
-//        await EcommerceDbContextData.LoadDataAsync(context,userManager,roleManager,loggerFactory);
-
-//        logger.LogInformation("Migration Completed !!!");
-//    }
-//    catch (Exception ex)
-//    {
-
-//        logger.LogError(ex,"Error en la migration");
-//    }
-
-//}
-
-
-
-
-
+// =====================================================================================
+// INICIO DE LA APLICACIÓN
+// =====================================================================================
 app.Run();
+
+
+
+
+// =====================================================================================
+// DOCUMENTACIÓN DE EXTENSIONES PERSONALIZADAS
+// =====================================================================================
+/*
+## 🏗️ CONVENCIONES ADOPTADAS PARA LAS EXTENSIONES
+
+### 📋 Nomenclatura Estándar:
+   - `AddCustom[Feature]` para ServiceCollection (registro de servicios)
+   - `UseCustom[Feature]` para ApplicationBuilder (configuración del pipeline)
+
+### 🔧 ServiceCollection Extensions (Registro de Servicios):
+    - AddCustomAuthentication() → JWT Bearer Token + ASP.NET Core Identity
+    - AddCustomCache()          → Memory Cache con configuración optimizada
+    - AddCustomCors()           → Políticas CORS para desarrollo/producción
+    - AddCustomDbContext()      → Entity Framework Core + SQL Server
+    - AddCustomFileUpload()     → Gestión de archivos grandes (50MB)
+    - AddCustomJson()           → Serialización JSON consistente
+    - AddCustomOpenApi()        → Swagger/OpenAPI con seguridad JWT
+    - AddCustomRateLimiting()   → Control de tráfico y prevención de abuso
+
+### 🚀 ApplicationBuilder Extensions (Pipeline de Middlewares):
+    - UseCustomDevelopment()    → Herramientas de desarrollo (Swagger, logging)
+    - UseCustomMiddlewares()    → Pipeline HTTP ordenado y optimizado
+    - UseCustomMigrations()     → Migraciones automáticas y seed de datos
+
 
 
 /*
@@ -119,27 +175,41 @@ app.Run();
 
     - AddCustomAuthentication() - JWT y Identity
     - AddCustomCache()          - Memory Cache configurado
-    - AddCustomCors()           - Pol�ticas CORS
+    - AddCustomCors()           - Políticas CORS
     - AddCustomDatabase()       - Entity Framework y DbContext
-    - AddCustomFileUpload()     - Configuraci�n de archivos grandes
-    - AddCustomJson()           - Serializaci�n JSON
+    - AddCustomFileUpload()     - Configuración de archivos grandes
+    - AddCustomJson()           - Serialización JSON
     - AddCustomOpenApi()        - Swagger/OpenAPI
     - AddCustomRateLimiting()   - Rate limiting
 
 ## ApplicationBuilder Extensions
-    - UseCustomDevelopment()    - Configuraci�n de desarrollo
+    - UseCustomDevelopment()    - Configuración de desarrollo
     - UseCustomMiddlewares()    - Pipeline de middlewares
     - UseCustomMigrations()     - Migraciones y seed de datos
  */
 
-//cd amazonashop
+// =====================================================================================
+// COMANDOS DE DESARROLLO ÚTILES
+// =====================================================================================
+// Navegación al directorio:
+// cd amazonashop
+
+// Ejecución del proyecto:
 // dotnet run --project src/api
 // dotnet run --project Backend/src/Api/Ecommerce.Api 
 // dotnet run --project Backend/src/Api/Ecommerce.Api --launch-profile "Local Development"
 // dotnet run --project Backend/src/Api/Ecommerce.Api --launch-profile "Development"
-// https://localhost:5001/swagger/index.html
 
-//Datos de los usuarios => src\Infrastructure\Persistence\EcommerceDbContextData.cs
+// URLs importantes:
+// 🌐 API Swagger: https://localhost:5001/swagger/index.html
+// 📊 Health Check: https://localhost:5001/health
+
+// Archivos de configuración importantes:
+// 👥 Datos de usuarios iniciales: src\Infrastructure\Persistence\EcommerceDbContextData.cs
+// ⚙️ Configuración rate limiting: ratelimiting.json
+// 🔧 Settings principales: appsettings.json
+
+
 
 
 
