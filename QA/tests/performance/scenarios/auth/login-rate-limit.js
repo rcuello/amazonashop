@@ -109,11 +109,12 @@ export default function () {
 // === FUNCIONES HELPER ===
 function updateLoginMetrics(user, response, checksResult, debugMode = false) {
   const statusCode = response.status;
+
   //const isSuccessful = statusCode >= 200 && statusCode < 300;
   //const isClientError = statusCode >= 400 && statusCode < 500;
   const isServerError = statusCode >= 500 && statusCode < 600;
 
-  if(isServerError){
+  if (isServerError) {
     serverErrors.add(1);
   }
 
@@ -124,6 +125,8 @@ function updateLoginMetrics(user, response, checksResult, debugMode = false) {
     case 429:
       rateLimitErrors.add(1);
       blockedRequests.add(1);
+
+      //logger.info(JSON.stringify(response.headers));
       break;
     case 401:
     case 403:
@@ -137,21 +140,111 @@ function updateLoginMetrics(user, response, checksResult, debugMode = false) {
 
   authTokenValidation.add(hasValidToken);
 
+  const rateLimitHeaders = extractRateLimitHeaders(response.headers);
+
   if (debugMode || response.status >= 400) {
     const logLevel = response.status >= 400 ? "ERROR" : "DEBUG";
 
-    logger.info(
-      `[${logLevel}][${ENVIRONMENT.toUpperCase()}] VU: ${__VU}, Iter: ${__ITER}, Status: ${
-        response.status
-      }, Duration: ${Math.round(response.timings.duration)}ms, User: ${
-        user.email
-      }`
-    );
+    let logMessage = `[${logLevel}] VU: ${__VU}, Iter: ${__ITER}, Status: ${
+      response.status
+    }, Duration: ${Math.round(response.timings.duration)}ms, User: ${
+      user.email
+    }`;
 
-    if (response.status >= 400) {
-      //logger.debug(`[ERROR] Response body: ${response.body}`);
+    if (rateLimitHeaders.hasRateLimitInfo) {
+      logMessage += formatRateLimitMessage(rateLimitHeaders, statusCode);
+    }
+
+    logger.info(logMessage);
+
+    /*if (response.status >= 400) {
+      logger.debug(`[ERROR] Response body: ${response.body}`);
+    }*/
+    if (response.status >= 500) {
+      logger.error(
+        `[CRITICAL] Server error detected for user ${user.email}: ${response.body}`
+      );
     }
   }
+}
+
+function extractRateLimitHeaders(headers) {
+  const lowerHeaders = {};
+  Object.keys(headers).forEach((k) => {
+    lowerHeaders[k.toLowerCase()] = headers[k];
+  });
+
+  const rateLimitInfo = {
+    hasRateLimitInfo: false,
+    limit: null,
+    remaining: null,
+    reset: null,
+    window: null,
+    requestType: null,
+    retryAfter: null,
+  };
+
+  const headerMappings = [
+    { key: 'limit', headers: ['x-ratelimit-limit', 'x-rate-limit-limit'] },
+    { key: 'remaining', headers: ['x-ratelimit-remaining', 'x-rate-limit-remaining'] },
+    { key: 'reset', headers: ['x-ratelimit-reset', 'x-rate-limit-reset'] },
+    { key: 'window', headers: ['x-ratelimit-window', 'x-rate-limit-window'] },
+    { key: 'requestType', headers: ['x-ratelimit-requesttype', 'x-rate-limit-requesttype'] },
+    { key: 'retryAfter', headers: ['retry-after', 'x-retry-after'] }
+  ];
+
+  headerMappings.forEach(mapping => {
+    for (const headerName of mapping.headers) {
+      if (lowerHeaders[headerName]) {
+        rateLimitInfo[mapping.key] = lowerHeaders[headerName];
+        rateLimitInfo.hasRateLimitInfo = true;
+        break;
+      }
+    }
+  });
+
+  return rateLimitInfo;
+}
+
+function formatRateLimitMessage(rateLimitHeaders, statusCode) {
+  let message = "";
+
+  if (statusCode === 429) {
+    message += " 🚫 RATE LIMITED";
+  }
+
+  const parts = [];
+
+  if (rateLimitHeaders.limit) {
+    parts.push(`Limit: ${rateLimitHeaders.limit}`);
+  }
+
+  if (rateLimitHeaders.remaining !== null) {
+    const remaining = parseInt(rateLimitHeaders.remaining);
+    const emoji = remaining === 0 ? "❌" : remaining < 5 ? "⚠️" : "✅";
+    parts.push(`Remaining: ${remaining} ${emoji}`);
+  }
+
+  if (rateLimitHeaders.window) {
+    parts.push(`Window: ${rateLimitHeaders.window}`);
+  }
+
+  if (rateLimitHeaders.reset) {
+    const resetTime = new Date(parseInt(rateLimitHeaders.reset) * 1000);
+    const now = new Date();
+    const secondsUntilReset = Math.max(0, Math.floor((resetTime - now) / 1000));
+    parts.push(`Reset in: ${secondsUntilReset}s`);
+  }
+
+  if (rateLimitHeaders.retryAfter) {
+    parts.push(`Retry after: ${rateLimitHeaders.retryAfter}s`);
+  }
+
+  if (rateLimitHeaders.requestType) {
+    parts.push(`Type: ${rateLimitHeaders.requestType}`);
+  }
+
+  return parts.length > 0 ? ` | ${parts.join(", ")}` : "";
 }
 
 function getAuthToken(response) {

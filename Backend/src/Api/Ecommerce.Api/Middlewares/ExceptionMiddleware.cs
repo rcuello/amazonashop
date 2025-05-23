@@ -112,7 +112,7 @@ public class ExceptionMiddleware
             context.Response.Headers["X-RateLimit-Limit"] = rateLimitExceededException.MaxRequests.ToString();
             //context.Response.Headers["X-RateLimit-Remaining"] = "0";
             context.Response.Headers["X-RateLimit-Window"] = rateLimitExceededException.WindowMinutes.ToString();
-            context.Response.Headers["X-RateLimit-RequestType"] = rateLimitExceededException.RequestTypeName ?? "Unknown";
+            context.Response.Headers["X-RateLimit-RequestType"] = rateLimitExceededException.RequestTypeName ?? "Unknown";            
         }
 
         // Serializar y escribir la respuesta usando System.Text.Json
