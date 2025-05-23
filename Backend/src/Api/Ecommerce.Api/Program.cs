@@ -186,6 +186,33 @@ app.Run();
     - UseCustomDevelopment()    - Configuración de desarrollo
     - UseCustomMiddlewares()    - Pipeline de middlewares
     - UseCustomMigrations()     - Migraciones y seed de datos
+
+TODO:
+     // /health endpoint
+    app.UseCustomHealthChecks();      
+    // OpenTelemetry, Logging Middleware
+    app.UseCustomObservability();      
+    // EventStoreDB, Kafka + Outbox , RabbitMQ
+    builder.Services.AddCustomEventSourcing(); 
+
+    // Application Insights / Elastic APM para monitoreo en producción
+    builder.Services.AddCustomApplicationPerformanceMonitoring(builder.Configuration);
+    // Elasticsearch, Azure AI search para búsqueda avanzada de productos
+    builder.Services.AddCustomSearchEngine(builder.Configuration);
+    // ML.NET para recomendaciones de productos
+    builder.Services.AddCustomMachineLearning(builder.Configuration);
+    // Azure Cognitive Services / OpenAI integration
+    builder.Services.AddCustomAIServices(builder.Configuration);
+    // SignalR para notificaciones en tiempo real
+    builder.Services.AddCustomSignalR(builder.Configuration);
+    // Azure Blob Storage / AWS S3 / MinIO
+    builder.Services.AddCustomBlobStorage(builder.Configuration);
+    // Servicios de notificaciones push
+    builder.Services.AddCustomPushNotifications(builder.Configuration);
+    // Vault para gestión de secretos (HashiCorp Vault, Azure Key Vault)
+    builder.Services.AddCustomSecretManagement(builder.Configuration);
+    // OAuth2/OpenID Connect con múltiples proveedores
+    builder.Services.AddCustomExternalAuthentication(builder.Configuration);
  */
 
 // =====================================================================================
