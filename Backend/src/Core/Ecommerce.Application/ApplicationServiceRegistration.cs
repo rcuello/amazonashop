@@ -1,6 +1,5 @@
 using AutoMapper;
 using Ecommerce.Application.Behaviors;
-using Ecommerce.Application.Configuration;
 using Ecommerce.Application.Features.Auths.Users.Commands.RegisterUser;
 using Ecommerce.Application.Mappings;
 using FluentValidation;
@@ -28,8 +27,6 @@ public static class ApplicationServiceRegistration
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        //RateLimit
-        services.AddRateLimitServices(configuration);
 
         // Registrar FluentValidation
         services.AddValidatorsFromAssembly(typeof(RegisterUserCommandValidator).Assembly);
@@ -37,22 +34,4 @@ public static class ApplicationServiceRegistration
         return services;
     }
 
-    private static IServiceCollection AddRateLimitServices(
-                        this IServiceCollection services,
-                        IConfiguration configuration
-    )
-    {
-        // Configuración de RateLimit
-        services.Configure<RateLimitConfiguration>(configuration.GetSection(RateLimitConfiguration.SectionName));
-
-        // Validación de la configuración al startup
-        services.AddOptions<RateLimitConfiguration>()
-        .Bind(configuration.GetSection(RateLimitConfiguration.SectionName))
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
-
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RateLimitingBehavior<,>));
-
-        return services;
-    }
 }

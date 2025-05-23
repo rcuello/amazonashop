@@ -1,7 +1,5 @@
 using System.Text;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
 using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
@@ -10,24 +8,30 @@ using Ecommerce.Domain;
 using Ecommerce.Infrastructure.ImageCloudinary;
 using Ecommerce.Infrastructure.Persistence;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.DependencyInjection;
-using Ecommerce.Application.Configuration;
-using Microsoft.Extensions.Options;
+using Ecommerce.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+var isDevelopment = builder.Environment.IsDevelopmentOrLocal();
+
+// ===== CONFIGURACIÓN DE ARCHIVOS DE CONFIGURACIÓN =====
+// Agregar archivos de Rate Limiting separados
+builder.Configuration
+    .AddJsonFile("ratelimiting.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"ratelimiting.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+// ======================================================
 
 // Service registration
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
+
+builder.Services.AddCustomRateLimiting(builder.Configuration);
 
 // ===== CONFIGURACIÓN DE CACHE =====
 // 1. Memory Cache (para datos frecuentemente accedidos y de corta duración)
@@ -80,14 +84,14 @@ builder.Services.AddScoped<IManageImageService, CloudinaryManageImageService>();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-    options.SerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+    options.SerializerOptions.WriteIndented = isDevelopment;
     options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 });
 
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-    options.JsonSerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+    options.JsonSerializerOptions.WriteIndented = isDevelopment;
     options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 });
 
@@ -97,7 +101,7 @@ builder.Services.AddSingleton(serviceProvider =>
     return new System.Text.Json.JsonSerializerOptions
     {
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = environment.IsDevelopment(),
+        WriteIndented = isDevelopment,
         PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
     };
 });
@@ -158,14 +162,16 @@ var app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-var rateLimitConfig = app.Services.GetRequiredService<IOptions<RateLimitConfiguration>>().Value;
+
+
+/*var rateLimitConfig = app.Services.GetRequiredService<IOptions<RateLimitConfiguration>>().Value;
 
 logger.LogInformation("Rate Limiting {Status}. Environment: {Environment}",
     rateLimitConfig.Enabled ? "Enabled" : "Disabled",
-    builder.Environment.EnvironmentName);
+    builder.Environment.EnvironmentName);*/
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (isDevelopment)
 {
     app.MapOpenApi();
     app.UseSwaggerUI(options =>
@@ -184,6 +190,8 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+// Usar Rate Limiting
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -230,10 +238,11 @@ app.UseTemplatePreloading(onlyInProduction: false);
 
 app.Run();
 
-//cd amazonashop/Backend
+//cd amazonashop
 // dotnet run --project src/api
-// dotnet run --project src/api --launch-profile "https"
-// dotnet run --project Backend/src/Api/Ecommerce.Api --launch-profile "https"
+// dotnet run --project Backend/src/Api/Ecommerce.Api 
+// dotnet run --project Backend/src/Api/Ecommerce.Api --launch-profile "Local Development"
+// dotnet run --project Backend/src/Api/Ecommerce.Api --launch-profile "Development"
 // https://localhost:5001/swagger/index.html
 
 //Datos de los usuarios => src\Infrastructure\Persistence\EcommerceDbContextData.cs

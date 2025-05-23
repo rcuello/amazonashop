@@ -1,0 +1,101 @@
+{  
+  "RateLimiting": {
+    "EnableMetrics": true,
+    "Global": {
+      "Enabled": true,
+      "PermitLimit": 10,
+      "WindowMinutes": 1
+    },
+    "WhitelistedIPs": [
+      //"127.0.0.1",
+      //"::1",
+      //"0.0.0.0/0",
+      "192.168.0.0/16",
+      "172.16.0.0/12"
+    ],
+    "WhitelistedUserAgents": [
+      //"*"
+      "Docker"
+    ],
+    "Rejection": {
+      "IncludeRetryAfter": true,
+      "IncludeHeaders": true,
+      "LogRejections": true,
+      "CustomMessage": "[LOCAL] Rate limiting disabled for local development"
+    },
+    "Policies": {
+      "LoginPolicy": {
+        "Type": "FixedWindow",
+        "PermitLimit": 5, // Solo 20 intento(s)
+        "WindowMinutes": 1, // Por 1 minuto(s)
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "ForgotPasswordPolicy": {
+        "Type": "FixedWindow",
+        "PermitLimit": 10, // Solo 2 intentos
+        "WindowMinutes": 1, // Por 1 minuto(s)
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "ResetPasswordPolicy": {
+        "Type": "FixedWindow",
+        "PermitLimit": 10,
+        "WindowMinutes": 1,
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "AuthPolicy": {
+        "Type": "FixedWindow",
+        "PermitLimit": 5,
+        "WindowMinutes": 15,
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "AdminPolicy": {
+        "Type": "FixedWindow",
+        "PermitLimit": 50,
+        "WindowMinutes": 1,
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "WritePolicy": {
+        "Type": "TokenBucket",
+        "PermitLimit": 30,
+        "TokensPerPeriod": 5,
+        "ReplenishmentSeconds": 10,
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "ReadHeavyPolicy": {
+        "Type": "SlidingWindow",
+        "PermitLimit": 100,
+        "WindowMinutes": 1,
+        "SegmentsPerWindow": 6,
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "ReadPolicy": {
+        "Type": "Concurrency",
+        "PermitLimit": 20,
+        "QueueLimit": 10,
+        "QueueProcessingOrder": "OldestFirst",
+        "Enabled": true
+      },
+      "PublicPolicy": {
+        "Type": "FixedWindow",
+        "PermitLimit": 10,
+        "WindowMinutes": 1,
+        "Enabled": true,
+        "AutoReplenishment": true
+      },
+      "HealthCheckPolicy": {
+        "Type": "FixedWindow",
+        "PermitLimit": 100,
+        "WindowSeconds": 10,
+        "Enabled": true,
+        "AutoReplenishment": true
+      }
+    }
+  }
+}

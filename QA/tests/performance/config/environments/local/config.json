@@ -4,7 +4,7 @@
   "authTokenField": "token",
   "sleepTime":1,
   "endpoints": {
-    "login": "/api/v1/Usuario/login",
+    "login": "/api/v1/Auth/login",
     "register": "/api/v1/Usuario/register",
     "products": "/api/v1/Product",
     "orders": "/api/v1/Order",

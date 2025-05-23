@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using Ecommerce.Api.Extensions;
 using Ecommerce.Application.Exceptions;
 using Ecommerce.Application.Exceptions.App;
 using Ecommerce.Application.Models.Api;
@@ -93,7 +94,7 @@ public class ExceptionMiddleware
         };
 
         // Agregar detalles adicionales en entorno de desarrollo
-        if (_environment.IsDevelopment())
+        if (_environment.IsDevelopmentOrLocal())
         {
             errorResponse.Details = exception.StackTrace;
 
@@ -102,17 +103,6 @@ public class ExceptionMiddleware
             {
                 errorResponse.InnerErrors = innerExceptions;
             }
-        }
-
-        if(exception is RateLimitExceededException rateLimitExceededException)
-        {
-            var retryAfterSeconds = (rateLimitExceededException.WindowMinutes * 60).ToString();
-
-            context.Response.Headers["Retry-After"] = retryAfterSeconds;
-            context.Response.Headers["X-RateLimit-Limit"] = rateLimitExceededException.MaxRequests.ToString();
-            //context.Response.Headers["X-RateLimit-Remaining"] = "0";
-            context.Response.Headers["X-RateLimit-Window"] = rateLimitExceededException.WindowMinutes.ToString();
-            context.Response.Headers["X-RateLimit-RequestType"] = rateLimitExceededException.RequestTypeName ?? "Unknown";            
         }
 
         // Serializar y escribir la respuesta usando System.Text.Json

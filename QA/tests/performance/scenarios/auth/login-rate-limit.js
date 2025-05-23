@@ -24,6 +24,11 @@ logger.info(`🌍 Ambiente: ${ENVIRONMENT}`);
 // Logging condicional para debugging
 const isDebugMode = __ENV.DEBUG === "true" || config.debug === true;
 
+if(!config.endpoints?.login) {
+  logger.error("❌ Error: No se ha definido el endpoint de login en la configuración.");
+  throw new Error("Endpoint de login no definido");
+}
+
 // === MÉTRICAS ESPECÍFICAS ===
 export const rateLimitErrors = new Counter("rate_limit_errors");
 export const successfulLogins = new Counter("successful_logins");
@@ -57,7 +62,7 @@ export const options = {
 // === FUNCIÓN PRINCIPAL ===
 export default function () {
   const user = userManager.getRandomUser();
-  const loginEndpoint = config.endpoints?.login || "/api/v1/Usuario/login";
+  const loginEndpoint = config.endpoints?.login;
 
   // Realizar login con medición de tiempo
   const startTime = Date.now();
