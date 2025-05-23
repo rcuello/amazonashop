@@ -7,25 +7,11 @@ namespace Ecommerce.Api.Extensions.ServiceCollection;
 
 public static class DatabaseExtensions
 {
+
     /// <summary>
     /// Configura Entity Framework y servicios relacionados con base de datos
     /// </summary>
-    public static IServiceCollection AddCustomDatabase(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        // Configurar DbContext
-        services.AddCustomDbContext(configuration);
-
-        // Configurar MediatR
-        services.AddCustomMediatR();
-
-        return services;
-    }
-
-    private static IServiceCollection AddCustomDbContext(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddCustomDbContext(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddDbContext<EcommerceDbContext>(options =>
         {
@@ -49,12 +35,12 @@ public static class DatabaseExtensions
             });
 
             // Configuración adicional según el entorno
-            var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-            if (isDevelopment)
-            {
-                options.EnableSensitiveDataLogging();
-                options.EnableDetailedErrors();
-            }
+            //var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+            //if (isDevelopment)
+            //{
+            //    options.EnableSensitiveDataLogging();
+            //    options.EnableDetailedErrors();
+            //}
         });
 
         return services;

@@ -1,5 +1,8 @@
-﻿using Ecommerce.Domain;
+﻿using Ecommerce.Application.Identity;
+using Ecommerce.Application.Models.Token;
+using Ecommerce.Domain;
 using Ecommerce.Infrastructure.Persistence;
+using Ecommerce.Infrastructure.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +19,9 @@ public static class AuthenticationExtensions
     /// </summary>
     public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,IConfiguration configuration)
     {
+        // Servicios de autenticación e identidad
+        services.AddCustomAuthenticacionServices(configuration);
+        
         // Configurar Identity
         services.AddCustomIdentity();
 
@@ -23,6 +29,14 @@ public static class AuthenticationExtensions
         services.AddCustomJwtAuthentication(configuration);
 
 
+        return services;
+    }
+
+    private static IServiceCollection AddCustomAuthenticacionServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.AddTransient<IAuthService, AuthService>();
+        
         return services;
     }
 

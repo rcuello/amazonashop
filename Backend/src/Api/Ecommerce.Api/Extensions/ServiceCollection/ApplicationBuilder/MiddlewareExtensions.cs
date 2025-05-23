@@ -27,10 +27,12 @@ public static class MiddlewareExtensions
         app.UseCustomCors();
 
         // 6. Template Preloading (funcionalidad específica de la aplicación)
+        // Alternativa: app.UseTemplatePreloading(); // Solo precarga en producción por defecto
         app.UseCustomTemplatePreloading(onlyInProduction: false);
 
         // 7. Controllers (debe ser al final)       
         app.MapControllers();
+
 
         return app;
     }

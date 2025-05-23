@@ -27,6 +27,7 @@ public static class DatabaseMigrationExtensions
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
             // Opción 1: Usar migraciones (recomendado para producción)
+            // RC: Por ahora Esto creará la base de datos según el modelo actual, pero no mantendrá las migraciones.
             // await context.Database.MigrateAsync();
 
             // Opción 2: EnsureCreated (para desarrollo rápido)
@@ -43,16 +44,8 @@ public static class DatabaseMigrationExtensions
         catch (Exception ex)
         {
             logger.LogError(ex, "❌ Error durante la configuración de base de datos");
-
-            // En desarrollo, lanzar la excepción para debugging
-            var environment = services.GetRequiredService<IHostEnvironment>();
-            if (environment.IsDevelopment())
-            {
-                throw;
-            }
-
-            // En producción, podrías decidir si continuar o no
-            // throw;
+       
+            throw;
         }
 
         return app;
