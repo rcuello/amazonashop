@@ -8,6 +8,6 @@ namespace Ecommerce.Application.Models.Api
         public string? Details { get; set; }
         public string? InnerError { get; set; }
         public string? TraceId { get; set; }
-        public List<string> InnerErrors { get; set; }
+        public List<string>? InnerErrors { get; set; }
     }
 }

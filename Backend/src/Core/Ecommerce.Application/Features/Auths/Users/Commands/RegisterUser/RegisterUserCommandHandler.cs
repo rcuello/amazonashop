@@ -78,8 +78,9 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
 
             var emailMessage = new WelcomeUserEmailMessage(_templateRender)
             {
-                To = request.Email,
-                UserName=usuario.UserName,
+                To          = request.Email,
+                Subject     = "Bienvenido a Ecommerce",
+                UserName    = usuario.UserName!,
                 GettingStartedLink = "https://tuapp.com/empezar",                
             };
 

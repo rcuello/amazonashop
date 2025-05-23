@@ -12,8 +12,7 @@ namespace Ecommerce.Infrastructure.ImageCloudinary
     {
         public CloudinarySettings _cloudinarySettings { get; }
         private readonly ILogger<CloudinaryManageImageService> _logger;
-        private readonly Cloudinary _cloudinary;
-        private bool _disposed;
+        private readonly Cloudinary _cloudinary;        
 
         public CloudinaryManageImageService(IOptions<CloudinarySettings> cloudinarySettings, ILogger<CloudinaryManageImageService> logger)
         {

@@ -70,6 +70,11 @@ public class EcommerceDbContext : IdentityDbContext<Usuario>
 
         builder.Entity<IdentityRole>().Property(x=> x.Id).HasMaxLength(36);
         builder.Entity<IdentityRole>().Property(x=> x.NormalizedName).HasMaxLength(90);
+
+        builder.Entity<OrderItem>()
+            .Property(o => o.Precio)
+            .HasPrecision(18, 2);
+
     }
     public DbSet<Product>? Products { get; set; }
     public DbSet<Category>? Categories { get; set; }

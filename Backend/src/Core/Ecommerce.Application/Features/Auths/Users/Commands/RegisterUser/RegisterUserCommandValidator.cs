@@ -18,18 +18,18 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
             .NotEmpty()
             .WithMessage("El nombre es requerido")
             .Length(2, 100)
-            .WithMessage("El nombre debe tener entre 2 y 100 caracteres")
-            .Matches(@"^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$")
-            .WithMessage("El nombre solo puede contener letras y espacios");
+            .WithMessage("El nombre debe tener entre 2 y 100 caracteres");
+            //.Matches(@"^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$")
+            //.WithMessage("El nombre solo puede contener letras y espacios");
 
         // Validación de Apellido
         RuleFor(x => x.Apellido)
             .NotEmpty()
             .WithMessage("El apellido es requerido")
             .Length(2, 100)
-            .WithMessage("El apellido debe tener entre 2 y 100 caracteres")
-            .Matches(@"^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$")
-            .WithMessage("El apellido solo puede contener letras y espacios");
+            .WithMessage("El apellido debe tener entre 2 y 100 caracteres");
+            //.Matches(@"^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$")
+            //.WithMessage("El apellido solo puede contener letras y espacios");
 
         // Validación de Email
         RuleFor(x => x.Email)
@@ -45,9 +45,9 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
             .NotEmpty()
             .WithMessage("El nombre de usuario es requerido")
             .Length(3, 50)
-            .WithMessage("El nombre de usuario debe tener entre 3 y 50 caracteres")
-            .Matches(@"^[a-zA-Z0-9._-]+$")
-            .WithMessage("El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos");
+            .WithMessage("El nombre de usuario debe tener entre 3 y 50 caracteres");
+            //.Matches(@"^[a-zA-Z0-9._-]+$")
+            //.WithMessage("El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos");
 
         // Validación de Password
         RuleFor(x => x.Password)

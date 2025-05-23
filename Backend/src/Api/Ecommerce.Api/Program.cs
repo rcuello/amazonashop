@@ -20,6 +20,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.DependencyInjection;
+using Ecommerce.Application.Configuration;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -118,7 +120,8 @@ identityBuilder.AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<Usuario, Id
 identityBuilder.AddEntityFrameworkStores<EcommerceDbContext>();
 identityBuilder.AddSignInManager<SignInManager<Usuario>>();
 
-builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
+//builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:key"]!));
 
@@ -153,6 +156,14 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+var rateLimitConfig = app.Services.GetRequiredService<IOptions<RateLimitConfiguration>>().Value;
+
+logger.LogInformation("Rate Limiting {Status}. Environment: {Environment}",
+    rateLimitConfig.Enabled ? "Enabled" : "Disabled",
+    builder.Environment.EnvironmentName);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -185,8 +196,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var service = scope.ServiceProvider;
-    var loggerFactory = service.GetRequiredService<ILoggerFactory>();
-    var logger = loggerFactory.CreateLogger<Program>();
+    var loggerFactory = service.GetRequiredService<ILoggerFactory>();    
 
     try
     {

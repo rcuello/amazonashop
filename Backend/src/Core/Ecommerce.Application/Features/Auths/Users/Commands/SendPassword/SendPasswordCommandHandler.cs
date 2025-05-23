@@ -41,8 +41,9 @@ public class SendPasswordCommandHandler : IRequestHandler<SendPasswordCommand, s
 
         var emailMessage = new PasswordResetEmailMessage(_templateRender)
         {
-            To = request.Email,
-            ResetLink = resetUrl,
+            To          = request.Email!,
+            Subject     = "Cambiar el password",
+            ResetLink   = resetUrl,
             BodyContent = "Resetear el password, dale click aqui:"
         };
 

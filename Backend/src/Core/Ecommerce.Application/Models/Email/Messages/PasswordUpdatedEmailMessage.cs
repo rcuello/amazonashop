@@ -6,10 +6,10 @@ namespace Ecommerce.Application.Models.Email.Messages
     public class PasswordUpdatedEmailMessage : IEmailMessage
     {
         private readonly ITemplateRender _templateRender;
-        public string To { get; set; }
-        public string Subject { get; set; } = "Tu contraseña ha sido actualizada correctamente";
-        public string BodyContent { get; set; } = "Tu contraseña ha sido actualizada correctamente.";
-        public string LoginLink { get; set; }
+        public required string To { get; set; }
+        public required string Subject { get; set; }
+        public required string BodyContent { get; set; }
+        public required string LoginLink { get; set; }
 
         public PasswordUpdatedEmailMessage(ITemplateRender templateRender)
         {

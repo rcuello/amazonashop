@@ -25,8 +25,7 @@ namespace Ecommerce.Infrastructure.MessageImplementation
         public EmbeddedTemplateRenderer(
             IOptions<TemplateRendererOptions> options,
             ILogger<EmbeddedTemplateRenderer> logger,
-            IMemoryCache memoryCache = null
-            )
+            IMemoryCache memoryCache)
         {
             _options = options?.Value ?? new TemplateRendererOptions();
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -36,7 +35,7 @@ namespace Ecommerce.Infrastructure.MessageImplementation
 
             // Obtener la información de la asamblea que contiene los recursos
             _resourceAssembly = Assembly.GetExecutingAssembly();
-            _assemblyName = _resourceAssembly.GetName().Name;
+            _assemblyName = _resourceAssembly.GetName().Name!;
 
             // Precargamos todos los nombres de recursos disponibles para diagnóstico
             _availableResources = _resourceAssembly.GetManifestResourceNames();
@@ -91,9 +90,15 @@ namespace Ecommerce.Infrastructure.MessageImplementation
                 _logger.LogDebug("Intentando renderizar plantilla '{TemplateKey}'", fullTemplatePath);
 
                 // Intentar obtener desde caché primero si está habilitado
-                if (_options.EnableCaching && _templateCache.TryGetValue(cacheKey, out Template cachedTemplate))
+                if (_options.EnableCaching && _templateCache.TryGetValue(cacheKey, out Template? cachedTemplate))
                 {
+                    if (cachedTemplate is null)
+                    {
+                        throw new TemplateRenderException($"Se esperaba que la plantilla '{templateName}' estuviera en caché, pero era null.");
+                    }
+
                     _logger.LogDebug("Plantilla {TemplateName} obtenida de caché", templateName);
+
                     return await RenderTemplateWithModelAsync(cachedTemplate, model, cancellationToken);
                 }
 
@@ -121,6 +126,9 @@ namespace Ecommerce.Infrastructure.MessageImplementation
 
                     // Cargar y compilar la plantilla
                     Template template = await LoadAndCompileTemplateAsync(fullTemplatePath, cancellationToken);
+
+                    if (template == null) throw new TemplateRenderException($"No se pudo compilar la plantilla '{templateName}'");
+                    
 
                     // Almacenar en caché si está habilitado
                     if (_options.EnableCaching)

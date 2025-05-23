@@ -5,10 +5,10 @@ namespace Ecommerce.Application.Models.Email.Messages
     public class PasswordResetEmailMessage : IEmailMessage
     {
         private readonly ITemplateRender _templateRender;
-        public string To { get; set; }
-        public string Subject { get; set; } = "Cambiar el password";
-        public string BodyContent { get; set; } = "Resetear el password, dale click aqui:";
-        public string ResetLink { get; set; }
+        public required string To { get; set; }
+        public required string Subject { get; set; }
+        public required string BodyContent { get; set; } = "Resetear el password, dale click aqui:";
+        public required string ResetLink { get; set; }
 
         public PasswordResetEmailMessage(ITemplateRender templateRender)
         {

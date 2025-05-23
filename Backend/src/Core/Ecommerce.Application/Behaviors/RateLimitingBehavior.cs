@@ -1,9 +1,10 @@
-﻿using Ecommerce.Application.Exceptions.App;
+﻿using Ecommerce.Application.Configuration;
+using Ecommerce.Application.Exceptions.App;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 namespace Ecommerce.Application.Behaviors
@@ -17,21 +18,28 @@ namespace Ecommerce.Application.Behaviors
         private readonly IMemoryCache _cache;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<RateLimitingBehavior<TRequest, TResponse>> _logger;
-        private static readonly ConcurrentDictionary<string, RateLimitRule> _rateLimitRules = new();
+        private readonly RateLimitConfiguration _config;        
 
         public RateLimitingBehavior(
-        IMemoryCache cache,
-        IHttpContextAccessor httpContextAccessor,
-        ILogger<RateLimitingBehavior<TRequest, TResponse>> logger)
+            IOptions<RateLimitConfiguration> rateLimitOptions,
+            IMemoryCache cache,
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<RateLimitingBehavior<TRequest, TResponse>> logger)
         {
             _cache = cache;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
-            InitializeRateLimitRules();
+            _config = rateLimitOptions.Value;            
         }
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
+            // Si está deshabilitado globalmente, continuar sin rate limiting
+            if (!_config.Enabled)
+            {
+                return await next();
+            }
+
             var requestType = typeof(TRequest);
             var rule = GetRateLimitRule(requestType);
 
@@ -42,10 +50,10 @@ namespace Ecommerce.Application.Behaviors
 
                 if (!await CheckRateLimit(key, rule))
                 {
-                    _logger.LogWarning("Rate limit exceeded for {RequestType} by client {ClientId}",
-                        requestType.Name, clientId);
+                    _logger.LogWarning("Rate limit exceeded for {RequestType} by client {ClientId}. Rule: {MaxRequests} requests per {WindowMinutes} minutes",
+                        requestType.Name, clientId, rule.MaxRequests, rule.WindowMinutes);
 
-                    throw new RateLimitExceededException($"Rate limit exceeded for {requestType.Name}");
+                    throw new RateLimitExceededException($"Rate limit exceeded for {requestType.Name}. Maximum {rule.MaxRequests} requests per {rule.WindowMinutes} minutes allowed.");
                 }
 
                 _logger.LogDebug("Rate limit check passed for {RequestType} by client {ClientId}",
@@ -53,57 +61,35 @@ namespace Ecommerce.Application.Behaviors
             }
 
             return await next();
-        }
-
-        private void InitializeRateLimitRules()
-        {
-            // Reglas específicas por tipo de comando/query
-            _rateLimitRules.TryAdd("LoginUserCommand", new RateLimitRule { MaxRequests = 5, WindowMinutes = 1 });
-            _rateLimitRules.TryAdd("RegisterUserCommand", new RateLimitRule { MaxRequests = 3, WindowMinutes = 5 });
-            _rateLimitRules.TryAdd("ResetPasswordCommand", new RateLimitRule { MaxRequests = 2, WindowMinutes = 60 });
-            _rateLimitRules.TryAdd("ResetPasswordByTokenCommand", new RateLimitRule { MaxRequests = 3, WindowMinutes = 5 });
-            _rateLimitRules.TryAdd("SendPasswordCommand", new RateLimitRule { MaxRequests = 2, WindowMinutes = 60 });
-
-            // Commands (operaciones de escritura)
-            _rateLimitRules.TryAdd("UpdateUserCommand", new RateLimitRule { MaxRequests = 10, WindowMinutes = 1 });
-            _rateLimitRules.TryAdd("UpdateAdminUserCommand", new RateLimitRule { MaxRequests = 5, WindowMinutes = 1 });
-            _rateLimitRules.TryAdd("UpdateAdminStatusUserCommand", new RateLimitRule { MaxRequests = 2, WindowMinutes = 5 });
-
-            // Queries (operaciones de lectura) - más permisivas
-            _rateLimitRules.TryAdd("GetUserByIdQuery", new RateLimitRule { MaxRequests = 100, WindowMinutes = 1 });
-            _rateLimitRules.TryAdd("GetUserByTokenQuery", new RateLimitRule { MaxRequests = 50, WindowMinutes = 1 });
-            _rateLimitRules.TryAdd("GetUserByUsernameQuery", new RateLimitRule { MaxRequests = 30, WindowMinutes = 1 });
-            _rateLimitRules.TryAdd("PaginationUsersQuery", new RateLimitRule { MaxRequests = 10, WindowMinutes = 1 });
-            _rateLimitRules.TryAdd("GetRolesQuery", new RateLimitRule { MaxRequests = 20, WindowMinutes = 1 });
-        }
+        }        
 
         private RateLimitRule? GetRateLimitRule(Type requestType)
         {
             var requestName = requestType.Name;
 
-            // Buscar regla específica
-            if (_rateLimitRules.TryGetValue(requestName, out var specificRule))
+            // 1. Buscar regla específica en configuración
+            if (_config.SpecificRules.TryGetValue(requestName, out var specificRule))
             {
                 return specificRule;
             }
 
-            // Reglas por categoría usando convenciones de nombre
+            // 2. Aplicar reglas por categoría usando convenciones de nombre
             if (requestName.EndsWith("Command"))
             {
                 // Comandos críticos de seguridad
                 if (requestName.Contains("Password") || requestName.Contains("Reset") || requestName.Contains("Send"))
                 {
-                    return new RateLimitRule { MaxRequests = 3, WindowMinutes = 5 };
+                    return _config.Categories.SecurityCommands;
                 }
 
                 // Comandos administrativos
                 if (requestName.Contains("Admin"))
                 {
-                    return new RateLimitRule { MaxRequests = 10, WindowMinutes = 1 };
+                    return _config.Categories.AdminCommands;
                 }
 
                 // Comandos generales de escritura
-                return new RateLimitRule { MaxRequests = 20, WindowMinutes = 1 };
+                return _config.Categories.GeneralCommands;
             }
 
             if (requestName.EndsWith("Query"))
@@ -111,17 +97,18 @@ namespace Ecommerce.Application.Behaviors
                 // Queries de paginación (más costosas)
                 if (requestName.Contains("Pagination") || requestName.Contains("List"))
                 {
-                    return new RateLimitRule { MaxRequests = 15, WindowMinutes = 1 };
+                    return _config.Categories.PaginationQueries;
                 }
 
                 // Queries generales de lectura
-                return new RateLimitRule { MaxRequests = 60, WindowMinutes = 1 };
+                return _config.Categories.GeneralQueries;
             }
 
-            return null; // Sin rate limiting
+            // 3. Regla por defecto si está configurada
+            return _config.DefaultRule;
         }
 
-        private async Task<bool> CheckRateLimit(string key, RateLimitRule rule)
+        private Task<bool> CheckRateLimit(string key, RateLimitRule rule)
         {
             var currentTime = DateTime.UtcNow;
             var windowStart = currentTime.AddMinutes(-rule.WindowMinutes);
@@ -136,6 +123,12 @@ namespace Ecommerce.Application.Behaviors
                 return new List<DateTime>();
             });
 
+            if (requestLog == null)
+            {
+                requestLog = new List<DateTime>();
+                _cache.Set(key, requestLog, TimeSpan.FromMinutes(rule.WindowMinutes + 1));
+            }
+
             lock (requestLog)
             {
                 // Limpiar requests antiguos
@@ -144,7 +137,7 @@ namespace Ecommerce.Application.Behaviors
                 // Verificar si excede el límite
                 if (requestLog.Count >= rule.MaxRequests)
                 {
-                    return false;
+                    return Task.FromResult(false);
                 }
 
                 // Agregar el request actual
@@ -154,7 +147,7 @@ namespace Ecommerce.Application.Behaviors
                 _cache.Set(key, requestLog, TimeSpan.FromMinutes(rule.WindowMinutes + 1));
             }
 
-            return true;
+            return Task.FromResult(true);
         }
 
         private string GetClientIdentifier()

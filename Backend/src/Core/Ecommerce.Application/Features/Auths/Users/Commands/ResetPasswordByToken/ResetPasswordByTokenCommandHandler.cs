@@ -131,8 +131,9 @@ public class ResetPasswordByTokenCommandHandler : IRequestHandler<ResetPasswordB
         {
             var emailMessage = new PasswordUpdatedEmailMessage(_templateRender)
             {
-                To = usuario.Email,
-                LoginLink = "https://tuapp.com/login",
+                To          = usuario.Email!,
+                Subject     = "Tu contraseña ha sido actualizada correctamente",
+                LoginLink   = "https://tuapp.com/login",
                 BodyContent = "Tu contraseña ha sido actualizada correctamente."
             };
 
