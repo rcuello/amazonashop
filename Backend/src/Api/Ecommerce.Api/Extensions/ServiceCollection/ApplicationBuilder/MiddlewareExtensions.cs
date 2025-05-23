@@ -29,8 +29,7 @@ public static class MiddlewareExtensions
         // 6. Template Preloading (funcionalidad específica de la aplicación)
         app.UseCustomTemplatePreloading(onlyInProduction: false);
 
-        // 7. Routing y Controllers (debe ser al final)
-        app.UseRouting();
+        // 7. Controllers (debe ser al final)       
         app.MapControllers();
 
         return app;

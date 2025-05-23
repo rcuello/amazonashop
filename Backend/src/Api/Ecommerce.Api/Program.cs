@@ -1,15 +1,13 @@
-using System.Text;
 using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Domain;
 using Ecommerce.Infrastructure.ImageCloudinary;
 using Ecommerce.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Ecommerce.Api.Extensions.ServiceCollection;
+using Ecommerce.Api.Extensions.ServiceCollection.ApplicationBuilder;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = builder.Environment.IsDevelopmentOrLocal();
@@ -83,6 +81,9 @@ var app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
+app.UseCustomMiddlewares(isDevelopment);
+
+/*
 // ===== Uso DE OpenApi =====
 app.UseCustomOpenApi(isDevelopment);
 
@@ -99,6 +100,7 @@ app.UseAuthorization();
 app.UseCustomCors();
 
 app.MapControllers();
+*/
 
 
 
