@@ -53,7 +53,11 @@ namespace Ecommerce.Application.Behaviors
                     _logger.LogWarning("Rate limit exceeded for {RequestType} by client {ClientId}. Rule: {MaxRequests} requests per {WindowMinutes} minutes",
                         requestType.Name, clientId, rule.MaxRequests, rule.WindowMinutes);
 
-                    throw new RateLimitExceededException($"Rate limit exceeded for {requestType.Name}. Maximum {rule.MaxRequests} requests per {rule.WindowMinutes} minutes allowed.");
+                    throw new RateLimitExceededException($"Rate limit exceeded for {requestType.Name}. Maximum {rule.MaxRequests} requests per {rule.WindowMinutes} minutes allowed.",
+                        requestType.Name,
+                        rule.MaxRequests,
+                        rule.WindowMinutes
+                        );
                 }
 
                 _logger.LogDebug("Rate limit check passed for {RequestType} by client {ClientId}",
