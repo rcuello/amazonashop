@@ -6,10 +6,17 @@ using System.Net;
 using System.Text.Json;
 
 
-namespace Ecommerce.Api.Extensions
+namespace Ecommerce.Api.Extensions.ServiceCollection
 {
     public static class RateLimitingExtensions
     {
+        public static WebApplication UseCustomRateLimiter(this WebApplication app)
+        {
+            app.UseRateLimiter();
+
+            return app;
+        }
+
         public static IServiceCollection AddCustomRateLimiting(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<RateLimitingConfiguration>(configuration.GetSection(RateLimitingConfiguration.SectionName));
@@ -26,7 +33,7 @@ namespace Ecommerce.Api.Extensions
                         httpContext =>
                         {
                             if (IsWhitelisted(httpContext, rateLimitConfig))
-                                return RateLimitPartition.GetNoLimiter<string>("whitelist");
+                                return RateLimitPartition.GetNoLimiter("whitelist");
 
                             return RateLimitPartition.GetFixedWindowLimiter(
                                 partitionKey: GetClientIdentifier(httpContext),
@@ -58,7 +65,7 @@ namespace Ecommerce.Api.Extensions
                 options.AddPolicy(policy.Key, httpContext =>
                 {
                     if (IsWhitelisted(httpContext, config))
-                        return RateLimitPartition.GetNoLimiter<string>("whitelist");
+                        return RateLimitPartition.GetNoLimiter("whitelist");
 
                     return policy.Value.Type.ToLowerInvariant() switch
                     {

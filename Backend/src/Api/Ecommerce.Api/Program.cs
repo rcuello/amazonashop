@@ -1,53 +1,33 @@
 using System.Text;
-using System.Text.Json.Serialization;
-using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
-using Ecommerce.Application.Features.Products.Queries.GetProductList;
 using Ecommerce.Domain;
 using Ecommerce.Infrastructure.ImageCloudinary;
 using Ecommerce.Infrastructure.Persistence;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Ecommerce.Api.Extensions;
+using Ecommerce.Api.Extensions.ServiceCollection;
+using Ecommerce.Api.Extensions.ServiceCollection.ApplicationBuilder;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = builder.Environment.IsDevelopmentOrLocal();
 
 // ===== CONFIGURACIÓN DE ARCHIVOS DE CONFIGURACIÓN =====
-// Agregar archivos de Rate Limiting separados
-builder.Configuration
-    .AddJsonFile("ratelimiting.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"ratelimiting.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddCustomConfigurationFiles(builder.Environment);
 // ======================================================
 
 // Service registration
-builder.Services.AddInfrastructureServices(builder.Configuration);
-builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddCustomInfrastructureServices(builder.Configuration);
+builder.Services.AddCustomEmailService(builder.Configuration);
+
+builder.Services.AddCustomApplicationServices(builder.Configuration);
 
 builder.Services.AddCustomRateLimiting(builder.Configuration);
 
 // ===== CONFIGURACIÓN DE CACHE =====
-// 1. Memory Cache (para datos frecuentemente accedidos y de corta duración)
-builder.Services.AddMemoryCache(options =>
-{
-    // OPCIÓN A: Sin SizeLimit (no requerirá Size en cada entrada)
-    options.SizeLimit = null; // Comentar o eliminar SizeLimit
-
-    // OPCIÓN B: Con SizeLimit (requerirá Size en cada entrada)
-    // Sino es especificado probablemente se lance el error:
-    // System.InvalidOperationException: 'Cache entry must specify a value for Size when SizeLimit is set.'
-    //options.SizeLimit = 1024; // Límite de entradas en caché
-
-    options.CompactionPercentage = 0.25; // 25% de compactación cuando se alcanza el límite
-    options.ExpirationScanFrequency = TimeSpan.FromMinutes(5); // Escaneo cada 5 minutos
-});
+builder.Services.AddCustomCache();
 
 
 builder.Services.AddDbContext<EcommerceDbContext>(option =>
@@ -76,44 +56,15 @@ builder.Services.AddDbContext<EcommerceDbContext>(option =>
     );
 });
 
-builder.Services.AddMediatR(typeof(GetProductListQueryHandler).Assembly);
+// ===== CONFIGURACIÓN DE MediatR =====
+builder.Services.AddCustomMediatR();
 
 // Para la subida de imagenes
 builder.Services.AddScoped<IManageImageService, CloudinaryManageImageService>();
 
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-    options.SerializerOptions.WriteIndented = isDevelopment;
-    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-});
+// ===== CONFIGURACIÓN DE Json =====
+builder.Services.AddCustomJson(builder.Environment);
 
-builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
-{
-    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-    options.JsonSerializerOptions.WriteIndented = isDevelopment;
-    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-});
-
-builder.Services.AddSingleton(serviceProvider =>
-{
-    var environment = serviceProvider.GetRequiredService<IHostEnvironment>();
-    return new System.Text.Json.JsonSerializerOptions
-    {
-        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = isDevelopment,
-        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-    };
-});
-
-
-
-builder.Services.AddControllers(opt =>
-{
-    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    opt.Filters.Add(new AuthorizeFilter(policy));
-}).AddJsonOptions(x =>
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 IdentityBuilder identityBuilder = builder.Services.AddIdentityCore<Usuario>();
 identityBuilder = new IdentityBuilder(identityBuilder.UserType, identityBuilder.Services);
@@ -142,62 +93,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAllPolicy", builder => builder.AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
-});
+// ===== CONFIGURACIÓN DE Cors =====
+builder.Services.AddCustomCors();
 
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.ValueLengthLimit = 52428800; // 50MB en bytes
-    options.MultipartBodyLengthLimit = 52428800; // 50MB en bytes
-    options.MultipartHeadersLengthLimit = 52428800; // 50MB en bytes
-});
+// ===== CONFIGURACIÓN DE FileUpload =====
+builder.Services.AddCustomFileUpload();
 
-builder.Services.AddOpenApi();
+// ===== CONFIGURACIÓN DE OpenApi =====
+builder.Services.AddCustomOpenApi();
 
 var app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-
-
-/*var rateLimitConfig = app.Services.GetRequiredService<IOptions<RateLimitConfiguration>>().Value;
-
-logger.LogInformation("Rate Limiting {Status}. Environment: {Environment}",
-    rateLimitConfig.Enabled ? "Enabled" : "Disabled",
-    builder.Environment.EnvironmentName);*/
-
-// Configure the HTTP request pipeline.
-if (isDevelopment)
-{
-    app.MapOpenApi();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "Ecommerce API");        
-    });
-
-    app.MapGet("/", context =>
-    {
-        context.Response.Redirect("/swagger");
-        return Task.CompletedTask;
-    });
-}
-
-app.UseHttpsRedirection();
-
-app.UseMiddleware<ExceptionMiddleware>();
-
-// Usar Rate Limiting
-app.UseRateLimiter();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseCors("AllowAllPolicy");
-
-app.MapControllers();
+// ===== Uso DE Middlewares =====
+app.UseCustomMiddlewares(isDevelopment);
 
 
 
@@ -233,7 +143,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Precargar plantillas de correo electrónico
-app.UseTemplatePreloading(onlyInProduction: false);
+//app.UseCustomTemplatePreloading(onlyInProduction: false);
+
 // Alternativa: app.UseTemplatePreloading(); // Solo precarga en producción por defecto
 
 app.Run();

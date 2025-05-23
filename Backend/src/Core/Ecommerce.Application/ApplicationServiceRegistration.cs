@@ -11,7 +11,7 @@ namespace Ecommerce.Application;
 
 public static class ApplicationServiceRegistration
 {
-    public static IServiceCollection AddApplicationServices(
+    public static IServiceCollection AddCustomApplicationServices(
                         this IServiceCollection services,
                         IConfiguration configuration
     )

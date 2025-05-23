@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Api.Extensions;
+﻿namespace Ecommerce.Api.Extensions.ServiceCollection;
 
 public static class HostEnvironmentExtensions
 {
