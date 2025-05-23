@@ -14,9 +14,7 @@ public static class AuthenticationExtensions
     /// <summary>
     /// Configura la autenticación JWT y Identity
     /// </summary>
-    public static IServiceCollection AddCustomAuthentication(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,IConfiguration configuration)
     {
         // Configurar Identity
         services.AddCustomIdentity();
@@ -24,8 +22,6 @@ public static class AuthenticationExtensions
         // Configurar JWT
         services.AddCustomJwtAuthentication(configuration);
 
-        // Configurar autorización global
-        services.AddCustomAuthorization();
 
         return services;
     }
@@ -68,7 +64,7 @@ public static class AuthenticationExtensions
                 };
 
                 // Configuración adicional para debugging
-                options.Events = new JwtBearerEvents
+                /*options.Events = new JwtBearerEvents
                 {
                     OnAuthenticationFailed = context =>
                     {
@@ -77,26 +73,9 @@ public static class AuthenticationExtensions
                         logger.LogWarning("Autenticación JWT falló: {Message}", context.Exception.Message);
                         return Task.CompletedTask;
                     }
-                };
+                };*/
             });
 
         return services;
-    }
-
-    private static IServiceCollection AddCustomAuthorization(this IServiceCollection services)
-    {
-        services.AddControllers(opt =>
-        {
-            // Política de autorización global - requiere usuario autenticado
-            var policy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-            opt.Filters.Add(new AuthorizeFilter(policy));
-        });
-
-        // Configurar TimeProvider para .NET 9
-        services.AddSingleton<TimeProvider>(TimeProvider.System);
-
-        return services;
-    }
+    }   
 }

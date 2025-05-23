@@ -1,4 +1,5 @@
 using System.Text;
+using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
 using Ecommerce.Application.Contracts.Infrastructure;
 using Ecommerce.Domain;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Ecommerce.Api.Extensions.ServiceCollection;
-using Ecommerce.Api.Extensions.ServiceCollection.ApplicationBuilder;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = builder.Environment.IsDevelopmentOrLocal();
@@ -65,33 +65,10 @@ builder.Services.AddScoped<IManageImageService, CloudinaryManageImageService>();
 // ===== CONFIGURACIÓN DE Json =====
 builder.Services.AddCustomJson(builder.Environment);
 
-
-IdentityBuilder identityBuilder = builder.Services.AddIdentityCore<Usuario>();
-identityBuilder = new IdentityBuilder(identityBuilder.UserType, identityBuilder.Services);
-
-identityBuilder.AddRoles<IdentityRole>().AddDefaultTokenProviders();
-identityBuilder.AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<Usuario, IdentityRole>>();
-
-identityBuilder.AddEntityFrameworkStores<EcommerceDbContext>();
-identityBuilder.AddSignInManager<SignInManager<Usuario>>();
-
 //builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:key"]!));
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = key,
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true
-        };
-    });
+builder.Services.AddCustomAuthentication(builder.Configuration);
 
 // ===== CONFIGURACIÓN DE Cors =====
 builder.Services.AddCustomCors();
@@ -106,8 +83,22 @@ var app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-// ===== Uso DE Middlewares =====
-app.UseCustomMiddlewares(isDevelopment);
+// ===== Uso DE OpenApi =====
+app.UseCustomOpenApi(isDevelopment);
+
+app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionMiddleware>();
+
+// Usar Rate Limiting
+app.UseCustomRateLimiter();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseCustomCors();
+
+app.MapControllers();
 
 
 
@@ -143,7 +134,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Precargar plantillas de correo electrónico
-//app.UseCustomTemplatePreloading(onlyInProduction: false);
+app.UseCustomTemplatePreloading(onlyInProduction: false);
 
 // Alternativa: app.UseTemplatePreloading(); // Solo precarga en producción por defecto
 
