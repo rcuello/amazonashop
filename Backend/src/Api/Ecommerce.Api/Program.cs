@@ -188,6 +188,8 @@ app.Run();
     - UseCustomMigrations()     - Migraciones y seed de datos
 
 TODO:
+    Patron Railway Oriented Programming para validaciones
+
      // /health endpoint
     app.UseCustomHealthChecks();      
     // OpenTelemetry, Logging Middleware
