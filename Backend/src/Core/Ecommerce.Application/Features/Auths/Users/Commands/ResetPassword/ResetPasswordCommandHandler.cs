@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace Ecommerce.Application.Features.Auths.Users.Commands.ResetPassword;
 
-public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand>
+public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, Unit>
 {
     private readonly IEmailService _serviceEmail;
     private readonly ITemplateRender _templateRender;

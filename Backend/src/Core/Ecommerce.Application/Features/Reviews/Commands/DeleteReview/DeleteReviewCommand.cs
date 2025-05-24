@@ -2,7 +2,7 @@ using MediatR;
 
 namespace Ecommerce.Application.Features.Reviews.Commands.DeleteReview;
 
-public class DeleteReviewCommand : IRequest
+public class DeleteReviewCommand : IRequest<Unit>
 {
     
     public int ReviewId { get; set; }

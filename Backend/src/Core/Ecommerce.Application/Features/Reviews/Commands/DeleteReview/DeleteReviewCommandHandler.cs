@@ -6,7 +6,7 @@ using MediatR;
 namespace Ecommerce.Application.Features.Reviews.Commands.DeleteReview;
 
 
-public class DeleteReviewCommandHandler : IRequestHandler<DeleteReviewCommand>
+public class DeleteReviewCommandHandler : IRequestHandler<DeleteReviewCommand,Unit>
 {
     private readonly IUnitOfWork _unitOfWork;
 
