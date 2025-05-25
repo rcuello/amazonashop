@@ -1,7 +1,6 @@
 using System.Net;
 using System.Text.Json;
 using Ecommerce.Api.Extensions.ServiceCollection;
-using Ecommerce.Application.Exceptions;
 using Ecommerce.Application.Exceptions.App;
 using Ecommerce.Application.Models.Api;
 
