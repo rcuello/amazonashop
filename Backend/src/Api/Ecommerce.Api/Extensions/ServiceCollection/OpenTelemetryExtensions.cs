@@ -34,6 +34,11 @@ public static class OpenTelemetryExtensions
         "ecommerce_user_registrations_total",
         "Total number of user registrations");
 
+    // AddServiceDiscovery
+    // AddOpenTelemetryTracing
+    // AddMetrics
+    // AddLogging
+
     public static IServiceCollection AddOpenTelemetryConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         var telemetryOptions = configuration

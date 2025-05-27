@@ -5,6 +5,9 @@ using Ecommerce.Api.Extensions.ServiceCollection.ApplicationBuilder;
 // INICIALIZACIÓN DEL BUILDER
 // =====================================================================================
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
+
 var isDevelopment = builder.Environment.IsDevelopmentOrLocal();
 
 // =====================================================================================
@@ -100,6 +103,13 @@ builder.Services.AddCustomCors();
 // ----------------------------------------------------
 // Configuración para subida de archivos grandes (imágenes, documentos)
 builder.Services.AddCustomFileUpload();
+
+
+// ----------------------------------------------------
+// GESTIÓN DE Logs
+// ----------------------------------------------------
+// Configuración para Serilog
+builder.Services.AddCustomLogger();
 
 // ----------------------------------------------------
 // DOCUMENTACIÓN DE API
