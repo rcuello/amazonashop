@@ -31,15 +31,16 @@ services:
     environment:
       # at least 16 characters
       - GRAYLOG_PASSWORD_SECRET=thispassshouldbeatleast16characters
+      # User    : admin
       # Password: admin
       - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9000/
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9001/
     entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
     depends_on:
       - mongo
       - elasticsearch
     ports:
-      - 9001:9001 # Graylog web interface and REST API
+      - 9001:9000 # Graylog web interface and REST API
       - 1514:1514
       - 1514:1514/udp
       - 12201:12201
@@ -47,4 +48,51 @@ services:
   #############################
   # Graylog configuration end #
   #############################
+
+# Iniciar
+# docker-compose up -d
+
+# Solo detener sin eliminar
+# docker-compose stop
+
+# Básico - elimina contenedores y redes
+# docker-compose down
+
+# Elimina también los volúmenes
+# docker-compose down -v
+
+# Elimina también las imágenes creadas por el compose
+# docker-compose down --rmi all
+
+# Combinado - elimina todo (contenedores, redes, volúmenes e imágenes)
+# docker-compose down -v --rmi all
+
+# Ver logs de Graylog
+# docker logs -f graylog
+
+# Verifica que Graylog esté corriendo
+# curl -I http://localhost:9001
+
+# Verifica que Graylog esté corriendo desde el host
+# curl -I --connect-timeout 5 http://localhost:9001/api/system/lbstatus
+
+# Verifica que Graylog esté corriendo desde el contenedor
+# docker exec -it graylog curl -I http://localhost:9000/
+
+# Verifica si el puerto 9000 está en uso
+# netstat -aon | findstr :9000
+#  TCP    127.0.0.1:63389        127.0.0.1:9000         TIME_WAIT       0
+#  TCP    127.0.0.1:63398        127.0.0.1:9000         ESTABLISHED     23540
+#  TCP    127.0.0.1:64886        127.0.0.1:9000         ESTABLISHED     29076
+#  TCP    127.0.0.1:64958        127.0.0.1:9000         ESTABLISHED     23540
+#  TCP    127.0.0.1:65403        127.0.0.1:9000         TIME_WAIT       0
+#  TCP    127.0.0.1:65412        127.0.0.1:9000         ESTABLISHED     36804
+
+# Si el comando netstat visualiza que el puerto 9000 está en uso, puedes identificar el proceso con:
+# tasklist /FI "PID eq 23540"
+# tasklist /FI "PID eq 29076"
+# tasklist /FI "PID eq 36804"
+
+
+
   

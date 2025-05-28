@@ -5,7 +5,7 @@ namespace Ecommerce.Api.Extensions.ServiceCollection;
 
 public static class LoggerExtensions
 {
-    public static ConfigureHostBuilder UseSerilog(this ConfigureHostBuilder hostBuilder)
+    public static ConfigureHostBuilder UseCustomLogger(this ConfigureHostBuilder hostBuilder)
     {
         hostBuilder.ConfigureSerilog();
 

@@ -6,7 +6,7 @@ using Ecommerce.Api.Extensions.ServiceCollection.ApplicationBuilder;
 // =====================================================================================
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog();
+builder.Host.UseCustomLogger();
 
 var isDevelopment = builder.Environment.IsDevelopmentOrLocal();
 
