@@ -1,86 +1,173 @@
+# ============================================================================
+# GRAYLOG STACK - Docker Compose Configuration
+# ============================================================================
+# Este archivo configura un stack completo de Graylog para centralizar logs
+# 
+# COMPONENTES DEL STACK:
+# - MongoDB: Base de datos para metadatos y configuración de Graylog
+# - Elasticsearch: Motor de búsqueda para almacenar y indexar los logs
+# - Graylog: Servidor principal para recibir, procesar y visualizar logs
+#
+# ACCESO WEB: http://localhost:9001
+# CREDENCIALES: admin / admin
+# ============================================================================
+
 version: "3.9"
 
 services:
   
   #########################
-  # Graylog configuration #
+  # MONGODB - Base de Datos
   #########################
-  # mongo should be called mongo
+  # MongoDB almacena la configuración de Graylog, usuarios, dashboards, etc.
+  # NO almacena los logs (eso va en Elasticsearch)
   mongo:
     container_name: mongo_graylog
     image: mongo:4.2
+    # NOTA: No exponemos puertos porque solo Graylog necesita acceso interno
+    # NOTA: No configuramos autenticación para simplicidad (solo desarrollo)
+
+  #############################
+  # ELASTICSEARCH - Búsqueda
+  #############################
+  # Elasticsearch es donde se almacenan e indexan todos los logs
+  # Graylog envía los logs aquí para búsquedas rápidas 
   elasticsearch:
     container_name: elasticserach_graylog
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    
+    # Variables de entorno para configurar Elasticsearch
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
       - network.host=0.0.0.0
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    
+    # Configuración de límites del sistema operativo
     ulimits:
       memlock:
         soft: -1
         hard: -1
+    # Límites de recursos del contenedor
     deploy:
       resources:
         limits:
-          memory: 1g
+          memory: 1g # Máximo 1GB de RAM para el contenedor
+
+  ############################
+  # GRAYLOG - Servidor Principal
+  ############################
+  # Graylog es el componente principal que:
+  # - Recibe logs de aplicaciones
+  # - Los procesa y parsea
+  # - Los almacena en Elasticsearch
+  # - Proporciona interfaz web para visualización
   graylog:
     image: graylog/graylog:4.2.5
     container_name: graylog
-    environment:
-      # at least 16 characters
-      - GRAYLOG_PASSWORD_SECRET=thispassshouldbeatleast16characters
-      # User    : admin
-      # Password: admin
-      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9001/
-    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
-    depends_on:
-      - mongo
-      - elasticsearch
-    ports:
-      - 9001:9000 # Graylog web interface and REST API
-      - 1514:1514
-      - 1514:1514/udp
-      - 12201:12201
-      - 12201:12201/udp
-  #############################
-  # Graylog configuration end #
-  #############################
 
-# Iniciar
+    # Variables de entorno críticas para Graylog
+    environment:
+      # Clave secreta para encriptar passwords (mínimo 16 caracteres)
+      - GRAYLOG_PASSWORD_SECRET=thispassshouldbeatleast16characters
+      # Hash SHA2 de la contraseña del usuario admin
+      # User    : admin
+      # Password: admin (hash SHA2 de "admin")
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      # URL externa donde Graylog será accesible (importante para API calls)
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9001/
+    
+    # Comando de inicio personalizado
+    # - Espera a que Elasticsearch esté disponible en puerto 9200
+    # - Luego ejecuta el entrypoint normal de Graylog
+    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
+    
+    # Dependencias - estos servicios deben iniciarse antes que Graylog
+    depends_on:
+      - mongo           # Necesita MongoDB para configuración
+      - elasticsearch   # Necesita Elasticsearch para almacenar logs
+    ports:
+      - 9001:9000      # Interfaz web y REST API (cambiado de 9000 a 9001)
+      - 1514:1514      # Syslog TCP - para recibir logs por syslog
+      - 1514:1514/udp  # Syslog UDP - para recibir logs por syslog
+      - 12201:12201    # GELF TCP - formato nativo de Graylog
+      - 12201:12201/udp # GELF UDP - formato nativo de Graylog
+
+
+# ============================================================================
+# COMANDOS ÚTILES PARA GESTIÓN DEL STACK
+# ============================================================================
+
+# ========================================
+# OPERACIONES BÁSICAS
+# ========================================
+
+# Iniciar todos los servicios en segundo plano
 # docker-compose up -d
 
-# Solo detener sin eliminar
+# Solo detener servicios sin eliminar contenedores
 # docker-compose stop
 
-# Básico - elimina contenedores y redes
+# Reiniciar todos los servicios
+# docker-compose restart
+
+# Reiniciar solo un servicio específico
+# docker-compose restart graylog
+
+# ========================================
+# LIMPIEZA Y ELIMINACIÓN
+# ========================================
+
+# Básico - elimina contenedores y redes (pero mantiene volúmenes e imágenes)
 # docker-compose down
 
-# Elimina también los volúmenes
+# Elimina también los volúmenes (CUIDADO: se pierden todos los datos)
 # docker-compose down -v
 
-# Elimina también las imágenes creadas por el compose
+# Elimina también las imágenes descargadas por este compose
 # docker-compose down --rmi all
 
-# Combinado - elimina todo (contenedores, redes, volúmenes e imágenes)
+# Combinado - eliminación completa (contenedores, redes, volúmenes e imágenes)
 # docker-compose down -v --rmi all
 
-# Ver logs de Graylog
+# ========================================
+# MONITOREO Y LOGS
+# ========================================
+
+# Ver logs de Graylog en tiempo real
 # docker logs -f graylog
 
-# Verifica que Graylog esté corriendo
+# Ver logs de todos los servicios
+# docker-compose logs -f
+
+# Ver logs de un servicio específico
+# docker-compose logs -f elasticsearch
+
+# Ver estado de todos los contenedores
+# docker-compose ps
+
+# ========================================
+# VERIFICACIÓN DEL ESTADO
+# ========================================
+
+# Verificar que Graylog esté respondiendo (interfaz web)
 # curl -I http://localhost:9001
 
-# Verifica que Graylog esté corriendo desde el host
+# Verificar estado específico de salud de Graylog
 # curl -I --connect-timeout 5 http://localhost:9001/api/system/lbstatus
 
-# Verifica que Graylog esté corriendo desde el contenedor
+# Verificar desde dentro del contenedor (debug)
 # docker exec -it graylog curl -I http://localhost:9000/
 
-# Verifica si el puerto 9000 está en uso
-# netstat -aon | findstr :9000
+# Ejecutar shell dentro del contenedor Graylog
+# docker exec -it graylog /bin/bash
+
+# ========================================
+# DIAGNÓSTICO DE PUERTOS
+# ========================================
+
+# Verificar si algún puerto está ocupado en Windows
+# netstat -aon | findstr :9001
 #  TCP    127.0.0.1:63389        127.0.0.1:9000         TIME_WAIT       0
 #  TCP    127.0.0.1:63398        127.0.0.1:9000         ESTABLISHED     23540
 #  TCP    127.0.0.1:64886        127.0.0.1:9000         ESTABLISHED     29076
@@ -88,11 +175,44 @@ services:
 #  TCP    127.0.0.1:65403        127.0.0.1:9000         TIME_WAIT       0
 #  TCP    127.0.0.1:65412        127.0.0.1:9000         ESTABLISHED     36804
 
-# Si el comando netstat visualiza que el puerto 9000 está en uso, puedes identificar el proceso con:
+# Verificar puertos ocupados en Linux/Mac
+# netstat -tulpn | grep :9001
+# lsof -i :9001
+
+# Si encuentras un proceso ocupando el puerto, puedes identificarlo:
+# En Windows: tasklist /FI "PID eq [NUMERO_PID]"
 # tasklist /FI "PID eq 23540"
 # tasklist /FI "PID eq 29076"
 # tasklist /FI "PID eq 36804"
+# En Linux/Mac: ps aux | grep [NUMERO_PID]
 
+# ========================================
+# INFORMACIÓN IMPORTANTE
+# ========================================
+
+# CREDENCIALES DEFAULT:
+# Usuario: admin
+# Password: admin
+# URL: http://localhost:9001
+
+# PUERTOS IMPORTANTES:
+# 9001 - Interfaz web Graylog
+# 1514 - Syslog (TCP/UDP)
+# 12201 - GELF (TCP/UDP)
+
+# VOLÚMENES:
+# Este compose NO define volúmenes persistentes
+# Si eliminas los contenedores, se pierden todos los datos
+# Para producción, agregar volúmenes para persistencia
+
+# RECURSOS:
+# Elasticsearch: máximo 1GB RAM
+# MongoDB y Graylog: sin límites específicos
+# Total recomendado: al menos 4GB RAM para el sistema
+
+# REDES:
+# Todos los contenedores están en la red default de Docker Compose
+# Se comunican entre ellos usando los nombres de servicio como hostname
 
 
   
