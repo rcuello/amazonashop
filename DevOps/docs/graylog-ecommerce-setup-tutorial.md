@@ -259,6 +259,20 @@ Has aprendido a:
 5. ✅ **Filtrar y buscar** logs específicos
 
 ---
+### 📖 Documentación Oficial y Recursos Web
+
+#### **Documentación Oficial:**
+- 📝 **[Graylog Documentation](https://docs.graylog.org/)** - Documentación completa oficial
+- 📝 **[Graylog REST API](https://docs.graylog.org/en/latest/pages/configuration/rest_api.html)** - Referencia de API
+- 📝 **[Graylog Configuration](https://docs.graylog.org/en/latest/pages/configuration/server.conf.html)** - Configuración avanzada del servidor
+
+#### **Tutoriales Básicos de Graylog:**
+- 📺 **[Graylog Tutorial for Beginners](https://www.youtube.com/results?search_query=graylog+tutorial+beginners)** - Conceptos fundamentales
+- 📺 **[Graylog Installation and Setup](https://www.youtube.com/results?search_query=graylog+installation+docker)** - Instalación paso a paso
+- 📺 **[Graylog Input Configuration](https://www.youtube.com/results?search_query=graylog+input+configuration)** - Configuración de inputs detallada
+
+
+---
 
 ## 🚀 Próximos Pasos
 
