@@ -1,0 +1,18 @@
+# ============================================================================
+# GRAYLOG STACK - Docker Compose Configuration
+# ============================================================================
+# Este archivo configura un stack completo de Graylog para centralizar logs
+# 
+# COMPONENTES DEL STACK:
+# - MongoDB: Base de datos para metadatos y configuración de Graylog
+# - Opensearch: Motor de búsqueda para almacenar y indexar los logs
+# - Graylog: Servidor principal para recibir, procesar y visualizar logs
+#
+# ACCESO WEB: http://localhost:9001
+# CREDENCIALES: admin / admin
+# ============================================================================
+
+version: "3.9"
+
+# TODO: Usar Opensearch
+
