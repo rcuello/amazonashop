@@ -1,5 +1,5 @@
 version: '3'
-
+# https://github.com/lawrencesystems/graylog
 networks:
   graynet:
     driver: bridge
