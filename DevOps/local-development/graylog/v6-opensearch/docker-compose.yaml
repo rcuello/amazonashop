@@ -35,7 +35,7 @@ services:
       - "action.auto_create_index=false"
       - "plugins.security.ssl.http.enabled=false"
       - "plugins.security.disabled=true"
-      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=SetPassw0rdL3ttersAndNumb3r5"
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
     volumes:
       - "log_data:/usr/share/opensearch/data"
     ulimits:
@@ -56,25 +56,25 @@ services:
     container_name: graylog
     environment:
       # CHANGE ME (must be at least 16 characters)!
-      GRAYLOG_PASSWORD_SECRET: "somepasswordpepper"
+      GRAYLOG_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET}
       # Password: admin
-      GRAYLOG_ROOT_PASSWORD_SHA2: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+      GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2}
       GRAYLOG_HTTP_EXTERNAL_URI: "http://localhost:9001/"
       GRAYLOG_ELASTICSEARCH_HOSTS: "http://opensearch:9200"
       GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
-      GRAYLOG_TIMEZONE: "America/Bogota"
-      TZ: "America/Bogota"
+      GRAYLOG_TIMEZONE: ${GRAYLOG_TIMEZONE}
+      TZ: ${GRAYLOG_TIMEZONE}
       GRAYLOG_TRANSPORT_EMAIL_PROTOCOL: "smtp"
       GRAYLOG_TRANSPORT_EMAIL_WEB_INTERFACE_URL: "http://192.168.3.233:9001/"
-      GRAYLOG_TRANSPORT_EMAIL_HOSTNAME: "outbound.mailhop.org"
+      GRAYLOG_TRANSPORT_EMAIL_HOSTNAME: ${SMTP_HOST}
       GRAYLOG_TRANSPORT_EMAIL_ENABLED: "true"
-      GRAYLOG_TRANSPORT_EMAIL_PORT: "587"
+      GRAYLOG_TRANSPORT_EMAIL_PORT: ${SMTP_PORT}
       GRAYLOG_TRANSPORT_EMAIL_USE_AUTH: "true"
-      GRAYLOG_TRANSPORT_EMAIL_AUTH_USERNAME: "xxxxx"
-      GRAYLOG_TRANSPORT_EMAIL_AUTH_PASSWORD: "xxxxx"
+      GRAYLOG_TRANSPORT_EMAIL_AUTH_USERNAME: ${SMTP_USER}
+      GRAYLOG_TRANSPORT_EMAIL_AUTH_PASSWORD: ${SMTP_PASSWORD}
       GRAYLOG_TRANSPORT_EMAIL_USE_TLS: "true"
       GRAYLOG_TRANSPORT_EMAIL_USE_SSL: "false"
-      GRAYLOG_TRANSPORT_FROM_EMAIL: "graylog@example.com"
+      GRAYLOG_TRANSPORT_FROM_EMAIL: ${SMTP_FROM_EMAIL}
       GRAYLOG_TRANSPORT_SUBJECT_PREFIX: "[graylog]"
 
     entrypoint: /usr/bin/tini -- wait-for-it opensearch:9200 -- /docker-entrypoint.sh

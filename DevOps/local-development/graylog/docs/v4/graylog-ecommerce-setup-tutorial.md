@@ -21,7 +21,7 @@ Este tutorial te enseñará cómo configurar un input personalizado llamado "Eco
    - **Usuario:** `admin`
    - **Contraseña:** `admin`
 
-![alt text](_attachments/graylog/graylog-login.png)
+![alt text](../_attachments/graylog/graylog-login.png)
 
 3. **Verificar acceso** - deberías ver el dashboard principal de Graylog
 
@@ -35,7 +35,7 @@ Este tutorial te enseñará cómo configurar un input personalizado llamado "Eco
 2. En el menú lateral izquierdo, seleccionar **"Inputs"**
 3. Te aparecerá la página de gestión de inputs
 
-![alt text](_attachments/graylog/graylog-menu-input.png)
+![alt text](../_attachments/graylog/graylog-menu-input.png)
 
 ### 2.2 Seleccionar tipo de Input
 
@@ -44,7 +44,7 @@ Este tutorial te enseñará cómo configurar un input personalizado llamado "Eco
    - **¿Por qué GELF UDP?** Es el formato nativo de Graylog, eficiente y con estructura JSON
 3. Hacer clic en **"Launch new input"**
 
-![alt text](_attachments/graylog/graylog-input-type.png)
+![alt text](../_attachments/graylog/graylog-input-type.png)
 
 ### 2.3 Configurar el Input
 
@@ -52,7 +52,7 @@ Se abrirá un modal de configuración. Completar los siguientes campos:
 
 #### **Configuración Básica:**
 - **Title:** `Ecommerce`
-![alt text](_attachments/graylog/graylog-new-input.png)
+![alt text](../_attachments/graylog/graylog-new-input.png)
 
 ### 2.4 Guardar Input
 
@@ -60,7 +60,7 @@ Se abrirá un modal de configuración. Completar los siguientes campos:
 2. Verificar que aparezca en la lista de inputs con estado **"RUNNING"**
 3. Deberías ver: `Ecommerce (GELF UDP) - RUNNING`
 
-![alt text](_attachments/graylog/graylog-input-running.png)
+![alt text](../_attachments/graylog/graylog-input-running.png)
 ---
 
 ## 📡 Paso 3: Enviar Log de Prueba
@@ -121,7 +121,7 @@ En tu aplicación real, configura el logger para enviar a `localhost:12201` usan
 2. Hacer clic en **"All messages"**
 3. Te llevará a la vista de búsqueda con todos los mensajes
 
-![alt text](_attachments/graylog/graylog-all-messages.png)
+![alt text](../_attachments/graylog/graylog-all-messages.png)
 
 ### 4.3 Configurar la Vista
 
@@ -134,13 +134,13 @@ En tu aplicación real, configura el logger para enviar a `localhost:12201` usan
    ```
    source:ecommerce-app
    ```
-![alt text](_attachments/graylog/graylog-all-messages-filtering.png)
+![alt text](../_attachments/graylog/graylog-all-messages-filtering.png)
 
 #### **Ajustar Tiempo:**
 1. En la parte superior derecha, ajustar el rango de tiempo
 2. Seleccionar **"Every 5 seconds"** o **"1 minute"**
 
-![alt text](_attachments/graylog/graylog-all-messages-time.png)
+![alt text](../_attachments/graylog/graylog-all-messages-time.png)
 
 
 ---
@@ -267,8 +267,8 @@ Has aprendido a:
 - 📝 **[Graylog Configuration](https://docs.graylog.org/en/latest/pages/configuration/server.conf.html)** - Configuración avanzada del servidor
 
 #### **Tutoriales Básicos de Graylog:**
-- 📺 **[Graylog Tutorial for Beginners](https://www.youtube.com/results?search_query=graylog+tutorial+beginners)** - Conceptos fundamentales
-- 📺 **[Graylog Installation and Setup](https://www.youtube.com/results?search_query=graylog+installation+docker)** - Instalación paso a paso
+- 📺 **[Graylog: Your Comprehensive Guide to Getting Started Open Source Log Management](https://www.youtube.com/watch?v=DwYwrADwCmg)** - Conceptos fundamentales
+- 📺 **[Graylog 6: The Best Open Source Logging Tool Got Better!](https://www.youtube.com/watch?v=PoP9BTktlFc&ab_channel=LawrenceSystems)** - Instalación paso a paso
 - 📺 **[Graylog Input Configuration](https://www.youtube.com/results?search_query=graylog+input+configuration)** - Configuración de inputs detallada
 
 

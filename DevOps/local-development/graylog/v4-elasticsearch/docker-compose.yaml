@@ -127,6 +127,9 @@ services:
 # Elimina también las imágenes descargadas por este compose
 # docker-compose down --rmi all
 
+# Elimina también los volumenes y las redes
+# docker-compose down -v
+
 # Combinado - eliminación completa (contenedores, redes, volúmenes e imágenes)
 # docker-compose down -v --rmi all
 
