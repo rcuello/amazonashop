@@ -1,4 +1,3 @@
-version: '3'
 # https://github.com/lawrencesystems/graylog
 networks:
   graynet:
@@ -64,10 +63,10 @@ services:
       GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
       GRAYLOG_TIMEZONE: ${GRAYLOG_TIMEZONE}
       TZ: ${GRAYLOG_TIMEZONE}
-      GRAYLOG_TRANSPORT_EMAIL_PROTOCOL: "smtp"
-      GRAYLOG_TRANSPORT_EMAIL_WEB_INTERFACE_URL: "http://192.168.3.233:9001/"
-      GRAYLOG_TRANSPORT_EMAIL_HOSTNAME: ${SMTP_HOST}
+      # Email transport config
       GRAYLOG_TRANSPORT_EMAIL_ENABLED: "true"
+      GRAYLOG_TRANSPORT_EMAIL_PROTOCOL: "smtp"
+      GRAYLOG_TRANSPORT_EMAIL_HOSTNAME: ${SMTP_HOST}
       GRAYLOG_TRANSPORT_EMAIL_PORT: ${SMTP_PORT}
       GRAYLOG_TRANSPORT_EMAIL_USE_AUTH: "true"
       GRAYLOG_TRANSPORT_EMAIL_AUTH_USERNAME: ${SMTP_USER}
@@ -76,10 +75,10 @@ services:
       GRAYLOG_TRANSPORT_EMAIL_USE_SSL: "false"
       GRAYLOG_TRANSPORT_FROM_EMAIL: ${SMTP_FROM_EMAIL}
       GRAYLOG_TRANSPORT_SUBJECT_PREFIX: "[graylog]"
-
+      GRAYLOG_TRANSPORT_EMAIL_WEB_INTERFACE_URL: "http://192.168.3.233:9001/"
     entrypoint: /usr/bin/tini -- wait-for-it opensearch:9200 -- /docker-entrypoint.sh
     volumes:
-      - "${PWD}/config/graylog/graylog.conf:/usr/share/graylog/config/graylog.conf"
+      #- "./config/graylog/graylog.conf:/usr/share/graylog/config/graylog.conf"
       - "graylog_data:/usr/share/graylog/data"
     networks:
       - graynet

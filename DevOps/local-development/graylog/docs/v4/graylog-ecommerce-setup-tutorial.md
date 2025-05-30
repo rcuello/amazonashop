@@ -262,7 +262,7 @@ Has aprendido a:
 ### 📖 Documentación Oficial y Recursos Web
 
 #### **Documentación Oficial:**
-- 📝 **[Graylog Documentation](https://docs.graylog.org/)** - Documentación completa oficial
+- 📝 **[Graylog Documentation v4](https://go2docs.graylog.org/4-0/home.htm)** - Documentación completa oficial
 - 📝 **[Graylog REST API](https://docs.graylog.org/en/latest/pages/configuration/rest_api.html)** - Referencia de API
 - 📝 **[Graylog Configuration](https://docs.graylog.org/en/latest/pages/configuration/server.conf.html)** - Configuración avanzada del servidor
 

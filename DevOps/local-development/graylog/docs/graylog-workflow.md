@@ -1,5 +1,7 @@
 ## Flujo de Procesamiento de Graylog
 
+docker exec -it graylog bash
+
 ```mermaid
 flowchart TD
     %% Capa de Entrada
