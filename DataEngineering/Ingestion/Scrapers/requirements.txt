@@ -1,0 +1,9 @@
+playwright==1.40.0
+polars
+
+# py -3.11 -m venv .venv
+# "C:\Users\<User>\AppData\Local\Programs\Python\Python311" venv .venv
+#  C:\Users\<User>\AppData\Local\Programs\Python\Python311\python.exe -m venv .venv
+
+# playwright install
+
