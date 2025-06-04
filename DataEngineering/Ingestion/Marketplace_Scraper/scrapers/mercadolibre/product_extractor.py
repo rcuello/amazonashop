@@ -1,7 +1,7 @@
 from typing import Optional, List
 from models.product import Product
 from models.price_info import PriceInfo
-from utils.helpers import extract_rating,extract_review_count,clean_price
+from utils.helpers import extract_number,clean_price
 
 
 class ProductExtractor:
@@ -194,7 +194,7 @@ class ProductExtractor:
             span_element = await element.query_selector('span.poly-reviews__rating')
             if span_element:
                 span_text = await span_element.inner_text()
-                return extract_rating(span_text)
+                return extract_number(span_text)
             
             return None
         except:
@@ -206,7 +206,7 @@ class ProductExtractor:
             span_element = await element.query_selector('span.poly-reviews__total')
             if span_element:
                 span_text = await span_element.inner_text()
-                return extract_review_count(span_text)
+                return extract_number(span_text)
             
             return None
         except:
