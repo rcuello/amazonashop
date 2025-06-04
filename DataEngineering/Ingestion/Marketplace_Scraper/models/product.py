@@ -30,16 +30,17 @@ class Product:
         """Convierte el producto a diccionario para exportar""" 
         return {
             'title': self.title,
-            'price': self.price,
-            'brand':self.brand,
+            'price': self.price,            
             'original_price': self.original_price,
+            'seller': self.seller,
             'currency': self.currency,
             'parent_category':self.parent_category,
             'category':self.category,
             'category2':self.category2,
+            
             'rating': self.rating,
             'reviews_count': self.reviews_count,
-            'seller': self.seller,
+            
             'availability': self.availability,
             'description': self.description[:200] + '...' if len(self.description) > 200 else self.description,
             'marketplace': self.marketplace,
