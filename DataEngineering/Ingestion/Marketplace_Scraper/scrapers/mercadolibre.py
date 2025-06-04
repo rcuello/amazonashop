@@ -6,7 +6,7 @@ from models.product import Product
 from scrapers.base_scraper import BaseScraper
 from utils.helpers import clean_price, clean_text, extract_rating, extract_number, make_absolute_url
 
-class MercadoLibreScraper(BaseScraper):
+class MercadoLibreScraperDeprecated(BaseScraper):
     """Scraper para MercadoLibre"""
     
     def __init__(self, country: str = "co"):

@@ -1,7 +1,7 @@
 import asyncio
 import argparse
 from typing import List
-from scrapers.mercadolibre import MercadoLibreScraper
+from scrapers.mercadolibre.scraper import MercadoLibreScraper
 from utils.exporters import DataExporter
 from models.product import Product
 
