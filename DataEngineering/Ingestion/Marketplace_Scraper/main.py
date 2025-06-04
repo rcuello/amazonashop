@@ -143,7 +143,8 @@ async def main():
      
 if __name__ == "__main__":
     asyncio.run(main())    
-    
+
+# python main.py "smarthphone" -m mercadolibre --country co --page 4    
 # python main.py "iphone 15" -m mercadolibre --country co
 # python main.py "sonos move 2" -m mercadolibre --country co  
 # python main.py "televisor samsung" -m mercadolibre --country co

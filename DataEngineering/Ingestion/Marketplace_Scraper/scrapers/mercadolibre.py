@@ -175,50 +175,7 @@ class MercadoLibreScraper(BaseScraper):
         except Exception as e:
             print(f"⚠️ Error obteniendo filtros activos: {e}")
             return []
-            
-    async def _build_pagination_base_url(self, encoded_query: str) -> None:
-        """
-        Construye la URL base para paginación extrayendo breadcrumb y filtros
-        Solo se ejecuta una vez y se cachea el resultado
-        """
-        try:
-            print("🔗 Construyendo URL base de paginación...")
-            
-            # Extraer breadcrumb para obtener la categoría
-            #breadcrumb = await self.extract_breadcrumb()
-            #if not breadcrumb:
-            #    print("⚠️ No se pudo extraer breadcrumb, usando URL base simple")
-            #    self._pagination_base_url = self.base_url
-            #    return
-            
-            # Buscar la categoría de nivel 2 (la más específica para productos)
-            #parent_category_item = next((item for item in breadcrumb if item['position'] == 1), None)
-            #category_item = next((item for item in breadcrumb if item['position'] == 2), None)
-            
                 
-            #if not category_item:
-            #    print("⚠️ No se encontró categoría de nivel 2, usando URL base simple")
-            #    self._pagination_base_url = self.base_url
-            #    return
-            
-            #if parent_category_item:
-            #    self.parent_category = parent_category_item['name']
-                
-            #if category_item:
-            #    self.category = category_item['name']
-                    
-            # Extraer filtros aplicados
-            applied_filters = await self.extract_applied_filters()
-            filter_suffix = f"/{applied_filters[0]}" if applied_filters else ""
-            
-            # Construir URL base de paginación
-            self._pagination_base_url = f"{self.category_url.rstrip('/')}{filter_suffix}"
-            
-            print(f"✅ URL base de paginación: {self._pagination_base_url}")
-            
-        except Exception as e:
-            print(f"❌ Error construyendo URL de paginación: {e}")
-            self._pagination_base_url = self.base_url
               
     async def post_navigate_validation(self) -> bool:
         """
