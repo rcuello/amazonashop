@@ -7,6 +7,7 @@ from scrapers.mercadolibre.filter_extractor import FilterExtractor
 from scrapers.mercadolibre.url_builder import URLBuilder
 from scrapers.mercadolibre.page_validator import PageValidator
 from scrapers.mercadolibre.product_extractor import ProductExtractor
+# https://mercadolibre.com/robots.txt
 
 class MercadoLibreScraper(BaseScraper):
     """Scraper para MercadoLibre"""
