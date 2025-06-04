@@ -19,6 +19,9 @@ class Product:
     marketplace: str = ""
     scraped_at: datetime = None
     brand:str=""
+    parent_category:str=""
+    category:str=""
+    category2:str=""
     
     def __post_init__(self):
         self.scraped_at = datetime.now()
@@ -31,13 +34,16 @@ class Product:
             'brand':self.brand,
             'original_price': self.original_price,
             'currency': self.currency,
-            'url': self.url,
-            'image_url': self.image_url,
+            'parent_category':self.parent_category,
+            'category':self.category,
+            'category2':self.category2,
             'rating': self.rating,
             'reviews_count': self.reviews_count,
             'seller': self.seller,
             'availability': self.availability,
             'description': self.description[:200] + '...' if len(self.description) > 200 else self.description,
             'marketplace': self.marketplace,
-            'scraped_at': self.scraped_at.isoformat()
+            'scraped_at': self.scraped_at.isoformat(),
+            'url': self.url,
+            'image_url': self.image_url,
         }

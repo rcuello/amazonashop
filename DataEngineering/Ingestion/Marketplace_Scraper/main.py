@@ -152,6 +152,12 @@ if __name__ == "__main__":
 # python main.py "iphone" -m mercadolibre --country co --page 4
 # python main.py "iphone" -m mercadolibre --country co
     # https://listado.mercadolibre.com.co/celulares-telefonos/celulares-smartphones/apple/iphone_Desde_51_NoIndex_True
+    
+# python main.py "airpods" -m mercadolibre --country co --page 2 
+# python main.py "airpods" -m mercadolibre --country co 
+    # https://listado.mercadolibre.com.co/airpods
+    # https://listado.mercadolibre.com.co/celulares-telefonos/accesorios-celulares/airpods_Desde_51_NoIndex_True
+   
 """
 marketplace_scraper/
 ├── scrapers/

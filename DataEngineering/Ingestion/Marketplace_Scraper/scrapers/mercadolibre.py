@@ -15,33 +15,167 @@ class MercadoLibreScraper(BaseScraper):
         self.country = country
         self.base_url = f"https://listado.mercadolibre.com.{country}"
         self.products_per_page = 50  # MercadoLibre muestra 50 productos por página
+        self.parent_category = ""
+        self.parent_category_url=""
+        self.category = ""
+        self.category_url=""
         # Cache para la URL base de paginación (se construye una vez)
         self._pagination_base_url = None
+        
+        self.category_info = {
+            'parent_category': '',
+            'parent_category_url': '',
+            'category': '',
+            'category_url': '',
+            'category2': '',
+            'category2_url': '',
+            'breadcrumb': []
+        }
+        
+        # Cache para URLs de paginación
+        self._pagination_cache = {
+            'base_url': None,
+            'search_params': {},
+            'filters': []
+        }
     
     async def build_search_url(self, query: str, **kwargs) -> str:
         """Construye URL de búsqueda para MercadoLibre"""
         encoded_query = quote_plus(query)
         page = kwargs.get('page', 1)
-        
-        url = f"{self.base_url}/{encoded_query}"
+                
         
         # Página 1: URL simple sin paginación
         if page == 1:
             return f"{self.base_url}/{encoded_query}"
         
-        # Páginas 2+: Usar la URL de paginación con offset
-        offset = ((page - 1) * self.products_per_page) + 1
-        
-        # Si no tenemos la URL base de paginación, la construimos
-        if self._pagination_base_url is None:
-            await self._build_pagination_base_url(encoded_query)
-        
-        # Construir URL final con offset
-        final_url = f"{self._pagination_base_url}/{encoded_query}_Desde_{offset}_NoIndex_True"
-        
-        print(f"📄 Página {page} | Offset: {offset} | URL: {final_url}")
-        return final_url
+        # Para páginas siguientes, construir URL con paginación
+        return await self._build_pagination_url(encoded_query, page)
   
+    async def _extract_category_info(self) -> None:
+        """Extrae y almacena información completa de categorías"""
+        try:
+            print("📂 Extrayendo información de categorías...")
+            
+            # Extraer breadcrumb
+            breadcrumb = await self.extract_breadcrumb()
+            self.category_info['breadcrumb'] = breadcrumb
+            
+            if not breadcrumb:
+                print("⚠️ No se pudo extraer breadcrumb")
+                return
+            
+            # Encontrar categoría padre (posición 1)
+            parent_category = next(
+                (item for item in breadcrumb if item['position'] == 1), 
+                None
+            )
+            
+            if parent_category:
+                self.category_info['parent_category'] = parent_category['name']
+                self.category_info['parent_category_url'] = parent_category['url']
+                print(f"📁 Categoría padre: {parent_category['name']}")
+            
+            # Encontrar subcategoría (posición 2)
+            subcategory = next(
+                (item for item in breadcrumb if item['position'] == 2), 
+                None
+            )
+            
+            # Encontrar subcategoría (posición 2)
+            subcategory2 = next(
+                (item for item in breadcrumb if item['position'] == 3), 
+                None
+            )
+            
+            if subcategory:
+                self.category_info['category'] = subcategory['name']
+                self.category_info['category_url'] = subcategory['url']
+                print(f"📂 Subcategoría: {subcategory['name']}")
+                
+            if subcategory2:
+                self.category_info['category2'] = subcategory2['name']
+                self.category_info['category2_url'] = subcategory2['url']
+                print(f"📂 Subcategoría 2: {subcategory2['name']}")
+            
+            # Si no hay subcategoría, usar la categoría padre como categoría principal
+            if not subcategory and parent_category:
+                self.category_info['category'] = parent_category['name']
+                self.category_info['category_url'] = parent_category['url']
+                print("📝 Usando categoría padre como categoría principal")
+                
+        except Exception as e:
+            print(f"❌ Error extrayendo información de categorías: {e}")
+                         
+    async def _build_pagination_url(self, encoded_query: str, page: int) -> str:
+        """Construye URL de paginación basada en la estructura actual de la página"""
+        try:
+            # Si no tenemos info de categorías, extraerla
+            if not self.category_info['category_url']:
+                await self._extract_category_info()
+            
+            # Calcular offset
+            offset = ((page - 1) * self.products_per_page) + 1
+            
+            # Obtener filtros aplicados
+            filters = await self._get_active_filters()
+            
+            # Construir URL base para paginación
+            if self.category_info['category_url']:
+                base_url = self.category_info['category_url'].rstrip('/')
+            else:
+                base_url = self.base_url
+            
+            # Agregar filtros si existen
+            filter_path = f"/{filters[0]}" if filters else ""
+            
+            # URL final de paginación
+            pagination_url = f"{base_url}{filter_path}/{encoded_query}_Desde_{offset}_NoIndex_True"
+            
+            print(f"📄 Página {page} | Offset: {offset}")
+            print(f"🔗 URL: {pagination_url}")
+            
+            return pagination_url
+            
+        except Exception as e:
+            print(f"❌ Error construyendo URL de paginación: {e}")
+            # Fallback a URL simple
+            offset = ((page - 1) * self.products_per_page) + 1
+            return f"{self.base_url}/{encoded_query}_Desde_{offset}_NoIndex_True"
+     
+     
+    async def _get_active_filters(self) -> List[str]:
+        """Obtiene filtros activos de manera más robusta"""
+        try:
+            filters = []
+            page = self.browser_manager.page
+            
+            # Múltiples selectores para filtros aplicados
+            filter_selectors = [
+                'section.ui-search-applied-filters .andes-tag__label',
+                '.ui-search-applied-filters .ui-search-applied-filter-name',
+                '[data-testid="applied-filters"] .andes-tag__label'
+            ]
+            
+            for selector in filter_selectors:
+                elements = await page.query_selector_all(selector)
+                if elements:
+                    for element in elements:
+                        try:
+                            filter_text = await element.inner_text()
+                            filter_text = filter_text.strip()
+                            if filter_text and filter_text not in filters:
+                                filters.append(filter_text)
+                        except:
+                            continue
+                    break  # Si encontramos filtros con un selector, usar esos
+            
+            return filters
+            
+        except Exception as e:
+            print(f"⚠️ Error obteniendo filtros activos: {e}")
+            return []
+            
     async def _build_pagination_base_url(self, encoded_query: str) -> None:
         """
         Construye la URL base para paginación extrayendo breadcrumb y filtros
@@ -51,26 +185,34 @@ class MercadoLibreScraper(BaseScraper):
             print("🔗 Construyendo URL base de paginación...")
             
             # Extraer breadcrumb para obtener la categoría
-            breadcrumb = await self.extract_breadcrumb()
-            if not breadcrumb:
-                print("⚠️ No se pudo extraer breadcrumb, usando URL base simple")
-                self._pagination_base_url = self.base_url
-                return
+            #breadcrumb = await self.extract_breadcrumb()
+            #if not breadcrumb:
+            #    print("⚠️ No se pudo extraer breadcrumb, usando URL base simple")
+            #    self._pagination_base_url = self.base_url
+            #    return
             
             # Buscar la categoría de nivel 2 (la más específica para productos)
-            category_item = next((item for item in breadcrumb if item['position'] == 2), None)
+            #parent_category_item = next((item for item in breadcrumb if item['position'] == 1), None)
+            #category_item = next((item for item in breadcrumb if item['position'] == 2), None)
             
-            if not category_item:
-                print("⚠️ No se encontró categoría de nivel 2, usando URL base simple")
-                self._pagination_base_url = self.base_url
-                return
+                
+            #if not category_item:
+            #    print("⚠️ No se encontró categoría de nivel 2, usando URL base simple")
+            #    self._pagination_base_url = self.base_url
+            #    return
             
+            #if parent_category_item:
+            #    self.parent_category = parent_category_item['name']
+                
+            #if category_item:
+            #    self.category = category_item['name']
+                    
             # Extraer filtros aplicados
             applied_filters = await self.extract_applied_filters()
             filter_suffix = f"/{applied_filters[0]}" if applied_filters else ""
             
             # Construir URL base de paginación
-            self._pagination_base_url = f"{category_item['url'].rstrip('/')}{filter_suffix}"
+            self._pagination_base_url = f"{self.category_url.rstrip('/')}{filter_suffix}"
             
             print(f"✅ URL base de paginación: {self._pagination_base_url}")
             
@@ -80,11 +222,10 @@ class MercadoLibreScraper(BaseScraper):
               
     async def post_navigate_validation(self) -> bool:
         """
-        Maneja validaciones específicas de MercadoLibre después de navegar
-        Basado en el script funcional original
+        Maneja validaciones específicas de MercadoLibre después de navegar        
         """
         try:
-            print("🔍 Ejecutando validaciones post-navegación para MercadoLibre...")
+            print("🔍 Ejecutando validaciones post-navegación...")
             
             # 1. Manejar popup de ubicación
             await self._handle_location_popup()
@@ -92,23 +233,13 @@ class MercadoLibreScraper(BaseScraper):
             # 2. Aplicar filtro de envío destacado
             await self._apply_shipping_filter()
             
-            # 3. Verificar que los elementos principales estén cargados
+             # 3. Extraer información de categorías
+            await self._extract_category_info()
+            
+            # 4. Verificar carga de productos
             if not await self._verify_page_loaded():
-                print("❌ La página no cargó correctamente")
+                #print("❌ La página no cargó correctamente")
                 return False
-            
-            #breadcrumb = await self.extract_breadcrumb()
-            #if not breadcrumb:
-            #    print(breadcrumb)
-                #print("❌ No se pudo extraer el breadcrumb")
-                #return False
-            
-            #filter = await self.extract_applied_filters()
-            #if filter:
-            #    print(filter)
-                
-            
-            
             
             print("✅ Validaciones post-navegación completadas")
             return True
@@ -138,8 +269,7 @@ class MercadoLibreScraper(BaseScraper):
         
     async def _apply_shipping_filter(self):
         """
-        Aplica filtro de envío destacado
-        Adaptado de apply_shipping_filter() del script original
+        Aplica filtro de envío destacado        
         """
         try:
             page = self.browser_manager.page
@@ -171,8 +301,7 @@ class MercadoLibreScraper(BaseScraper):
     
     async def get_product_elements(self):
         """
-        Obtiene los elementos de productos de MercadoLibre
-        Basado en la función scrape_products() del script original
+        Obtiene los elementos de productos de MercadoLibre        
         """
         try:
             page = self.browser_manager.page
@@ -224,15 +353,25 @@ class MercadoLibreScraper(BaseScraper):
             if image_element:
                 image_url = await image_element.get_attribute('src')
             
+            parent_category = self.category_info.get('parent_category', '')
+            category = self.category_info.get('category', '')
+            category2 = self.category_info.get('category2', '')
+            
             # Crear objeto Product
             product = Product(
                 title=title,
                 price=price_text,
-                url=link,
+                
                 marketplace=self.marketplace_name,
                 currency="COP" if self.country == "co" else "USD",
                 brand=brand_text,
-                image_url = image_url
+                
+                parent_category=parent_category,
+                category=category,
+                category2=category2,
+                
+                url=link,
+                image_url = image_url,
             )
             
             return product
@@ -395,102 +534,4 @@ class MercadoLibreScraper(BaseScraper):
             
         except Exception as e:
             print(f"❌ Error extrayendo filtros aplicados: {e}")
-            return filters
-                  
-    async def extract_product_info2(self, element) -> Optional[Product]:
-        """Extrae información de un producto de MercadoLibre"""
-        try:
-            # Título
-            title_selectors = [
-                '.ui-search-item__title',
-                '.ui-search-result__content-wrapper h2',
-                '[data-testid="item-title"]'
-            ]
-            
-            title = ""
-            for selector in title_selectors:
-                title_elem = await element.query_selector(selector)
-                if title_elem:
-                    title = await title_elem.inner_text()
-                    break
-            
-            if not title:
-                return None
-            
-            title = clean_text(title)
-            
-            # Precio
-            price = None
-            price_selectors = [
-                '.ui-search-price__part',
-                '.price-tag-fraction',
-                '[data-testid="price"]'
-            ]
-            
-            for selector in price_selectors:
-                price_elem = await element.query_selector(selector)
-                if price_elem:
-                    price_text = await price_elem.inner_text()
-                    price = clean_price(price_text)
-                    if price:
-                        break
-            
-            # URL del producto
-            url = ""
-            link_selectors = [
-                'a.ui-search-link',
-                'a[href*="/MLC"]',
-                'a[href*="/MLM"]'
-            ]
-            
-            for selector in link_selectors:
-                link_elem = await element.query_selector(selector)
-                if link_elem:
-                    href = await link_elem.get_attribute('href')
-                    if href:
-                        url = make_absolute_url(f"https://mercadolibre.com.{self.country}", href)
-                        break
-            
-            # Imagen
-            image_url = ""
-            img_elem = await element.query_selector('img')
-            if img_elem:
-                src = await img_elem.get_attribute('src')
-                if src:
-                    image_url = src
-            
-            # Rating (si existe)
-            rating = None
-            rating_elem = await element.query_selector('.ui-search-reviews__rating')
-            if rating_elem:
-                rating_text = await rating_elem.inner_text()
-                rating = extract_rating(rating_text)
-            
-            # Envío gratis
-            free_shipping = False
-            shipping_elem = await element.query_selector('.ui-search-item__shipping')
-            if shipping_elem:
-                shipping_text = await shipping_elem.inner_text()
-                free_shipping = 'gratis' in shipping_text.lower()
-            
-            # Ubicación del vendedor
-            location = ""
-            location_elem = await element.query_selector('.ui-search-item__location')
-            if location_elem:
-                location = clean_text(await location_elem.inner_text())
-            
-            return Product(
-                title=title,
-                price=price,
-                currency="COP" if self.country == "co" else "USD",
-                url=url,
-                image_url=image_url,
-                rating=rating,
-                seller=location,
-                availability="Disponible" if price else "Sin stock",
-                marketplace=self.marketplace_name
-            )
-            
-        except Exception as e:
-            print(f"Error extrayendo producto de MercadoLibre: {e}")
-            return None
+            return filters    
