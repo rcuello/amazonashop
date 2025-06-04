@@ -146,7 +146,12 @@ if __name__ == "__main__":
     
 # python main.py "iphone 15" -m mercadolibre --country co
 # python main.py "sonos move 2" -m mercadolibre --country co  
-# python main.py "televisor samsung" -m mercadolibre --country co    
+# python main.py "televisor samsung" -m mercadolibre --country co
+# python main.py "televisor samsung" -m mercadolibre --country co -p 2 
+# python main.py "iphone" -m mercadolibre --country co --page 2 
+# python main.py "iphone" -m mercadolibre --country co --page 4
+# python main.py "iphone" -m mercadolibre --country co
+    # https://listado.mercadolibre.com.co/celulares-telefonos/celulares-smartphones/apple/iphone_Desde_51_NoIndex_True
 """
 marketplace_scraper/
 ├── scrapers/

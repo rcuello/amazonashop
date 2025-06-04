@@ -115,3 +115,4 @@ if __name__ == "__main__":
     print(f"Total de productos extraídos: {len(products)}")
     
     # https://listado.mercadolibre.com.co/sonos-move-2
+    # https://listado.mercadolibre.com.co/televisor-samsung

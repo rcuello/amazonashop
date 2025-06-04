@@ -16,7 +16,7 @@ class BaseScraper(ABC):
         self.products: List[Product] = []
     
     @abstractmethod
-    def build_search_url(self, query: str, **kwargs) -> str:
+    async def build_search_url(self, query: str, **kwargs) -> str:
         """Construye la URL de búsqueda"""
         pass
     
@@ -59,7 +59,7 @@ class BaseScraper(ABC):
                 print(f"Scrapeando página {page_num} de {self.marketplace_name}")
                 
                 # Construir URL
-                search_url = self.build_search_url(query, page=page_num, **kwargs)
+                search_url = await self.build_search_url(query, page=page_num, **kwargs)
                 print(f"URL: {search_url}")
                 
                 # Navegar a la página
