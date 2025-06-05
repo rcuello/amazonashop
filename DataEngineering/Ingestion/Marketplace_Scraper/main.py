@@ -175,5 +175,18 @@ marketplace_scraper/
 │   └── helpers.py           # Funciones comunes
 ├── config/
 │   └── settings.py          # Configuraciones
+├── tests/
+│   ├── helpers/
+│   │   ├── test_is_valid_url.py
+│   │   ├── test_clean_price.py
+│   │   ├── test_extract_number.py
+│   │   ├── test_extract_integer.py
+│   │   └── test_clean_text.py
+│   ├── html/
+│   │   ├── mercadolibre_price_container.html
+│   │   ├── mercadolibre_price_con_descuento.html
+│   │   ├── mercadolibre_price_sin_descuento.html
+│   │
+│
 └── main.py                  # Orquestador simple
 """
