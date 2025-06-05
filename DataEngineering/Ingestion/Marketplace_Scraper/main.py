@@ -2,6 +2,7 @@ import asyncio
 import argparse
 from typing import List
 from scrapers.mercadolibre.scraper import MercadoLibreScraper
+from scrapers.falabella import FalabellaScraper
 from utils.exporters import DataExporter
 from models.product import Product
 
@@ -10,7 +11,8 @@ class MarketplaceScraper:
     
     def __init__(self):
         self.scrapers = {
-            'mercadolibre': MercadoLibreScraper
+            'mercadolibre': MercadoLibreScraper,
+            'falabella':FalabellaScraper
             #'amazon': AmazonScraper,
             #'ebay': EbayScraper,
             #'aliexpress': AliExpressScraper
@@ -110,7 +112,7 @@ async def main():
     parser = argparse.ArgumentParser(description='Marketplace Scraper')
     parser.add_argument('query', help='Término de búsqueda')
     parser.add_argument('-m', '--marketplaces', nargs='+', 
-                       choices=['mercadolibre', 'amazon', 'ebay', 'aliexpress'],
+                       choices=['mercadolibre', 'amazon', 'falabella', 'aliexpress'],
                        default=['mercadolibre'], help='Marketplaces a scrapear')
     parser.add_argument('-p', '--pages', type=int, default=1, help='Número de páginas por marketplace')
     parser.add_argument('-f', '--format', choices=['csv', 'json'], default='csv', help='Formato de exportación')
@@ -144,6 +146,8 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())    
 
+# python main.py "televisor" -m falabella --country co
+# python main.py "airpods" -m falabella --country co
 # python main.py "smarthphone" -m mercadolibre --country co --page 4    
 # python main.py "iphone 15" -m mercadolibre --country co
 # python main.py "sonos move 2" -m mercadolibre --country co  
