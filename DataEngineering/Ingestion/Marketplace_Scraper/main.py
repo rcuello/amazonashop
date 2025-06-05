@@ -1,10 +1,12 @@
 import asyncio
 import argparse
-from typing import List
+from typing import List,Optional
 from scrapers.mercadolibre.scraper import MercadoLibreScraper
 from scrapers.falabella.scraper import FalabellaScraper
+from scrapers.megatienda import MegaTiendaScraper
 from utils.exporters import DataExporter
 from models.product import Product
+from config.settings import Settings
 
 class MarketplaceScraper:
     """Orquestador principal del sistema de scraping"""
@@ -12,47 +14,68 @@ class MarketplaceScraper:
     def __init__(self):
         self.scrapers = {
             'mercadolibre': MercadoLibreScraper,
-            'falabella':FalabellaScraper
+            'falabella':FalabellaScraper,
+            'megatienda':MegaTiendaScraper
             #'amazon': AmazonScraper,
             #'ebay': EbayScraper,
             #'aliexpress': AliExpressScraper
         }
         self.exporter = DataExporter()
    
-    async def scrape_marketplace(self, marketplace: str, query: str, max_pages: int = 1, **kwargs) -> List[Product]:
+    async def scrape_marketplace(self, marketplace: str, query: str, max_pages: int = 1, mobile: bool = False, device: Optional[str] = None, **kwargs) -> List[Product]:
         """Scrapea un marketplace específico"""
         if marketplace not in self.scrapers:
             print(f"Marketplace '{marketplace}' no soportado")
             return []
         
-        print(f"\n=== Scrapeando {marketplace.upper()} ===")
+        # Mostrar información del modo
+        mode_info = self._get_mode_info(mobile, device)
+        print(f"\n=== Scrapeando {marketplace.upper()} {mode_info} ===")
         print(f"Query: {query}")
         print(f"Páginas: {max_pages}")
         
-        # Crear scraper específico
-        if marketplace == 'mercadolibre':
-            country = kwargs.get('country', 'co')
-            scraper = self.scrapers[marketplace](country=country)
-        elif marketplace == 'amazon':
-            domain = kwargs.get('domain', 'com')
-            scraper = self.scrapers[marketplace](domain=domain)
-        else:
-            scraper = self.scrapers[marketplace]()
+        # Crear scraper específico con soporte mobile
+        scraper = self._create_scraper(marketplace, mobile, device, **kwargs)
         
         # Realizar scraping
         products = await scraper.search_products(query, max_pages)
         
         print(f"Productos encontrados en {marketplace}: {len(products)}")
+        
         return products
     
-    
-    async def scrape_multiple_marketplaces(self, marketplaces: List[str], query: str, max_pages: int = 1, **kwargs) -> List[Product]:
+    def _create_scraper(self, marketplace: str, mobile: bool, device: Optional[str], **kwargs):
+        """Crea el scraper específico con configuración mobile"""
+        scraper_class = self.scrapers[marketplace]
+        
+        if marketplace == 'mercadolibre':
+            country = kwargs.get('country', 'co')
+            return scraper_class(country=country, mobile=mobile, device=device)
+        elif marketplace == 'amazon':
+            domain = kwargs.get('domain', 'com')
+            return scraper_class(domain=domain, mobile=mobile, device=device)
+        else:
+            return scraper_class(mobile=mobile, device=device)
+        
+    def _get_mode_info(self, mobile: bool, device: Optional[str]) -> str:
+        """Retorna información del modo de scraping"""
+        if not mobile:
+            return "[🖥️  Desktop]"
+        elif device:
+            return f"[📱 {device}]"
+        else:
+            return "[📱 Mobile]"
+        
+    async def scrape_multiple_marketplaces(self, marketplaces: List[str], query: str, max_pages: int = 1, 
+                                         mobile: bool = False, device: Optional[str] = None, **kwargs) -> List[Product]:
         """Scrapea múltiples marketplaces"""
         all_products = []
         
         for marketplace in marketplaces:
             try:
-                products = await self.scrape_marketplace(marketplace, query, max_pages, **kwargs)
+                products = await self.scrape_marketplace(
+                    marketplace, query, max_pages, mobile, device, **kwargs
+                )
                 all_products.extend(products)
             except Exception as e:
                 print(f"Error scrapeando {marketplace}: {e}")
@@ -106,13 +129,19 @@ class MarketplaceScraper:
             print(f"\nMejores precios:")
             for i, product in enumerate(products_with_price[:5]):
                 print(f"{i+1}. {product.title[:50]}... - ${product.price} ({product.marketplace})")
-
+def show_available_devices():
+    """Muestra dispositivos disponibles"""
+    print("\n📱 Dispositivos disponibles para emulación:")
+    for i, device in enumerate(Settings.DEVICES_NAMES, 1):
+        print(f"  {i:2d}. {device}")
+    print()
+    
 async def main():
     """Función principal"""
     parser = argparse.ArgumentParser(description='Marketplace Scraper')
     parser.add_argument('query', help='Término de búsqueda')
     parser.add_argument('-m', '--marketplaces', nargs='+', 
-                       choices=['mercadolibre', 'amazon', 'falabella', 'aliexpress'],
+                       choices=['mercadolibre', 'amazon', 'falabella', 'aliexpress','megatienda'],
                        default=['mercadolibre'], help='Marketplaces a scrapear')
     parser.add_argument('-p', '--pages', type=int, default=1, help='Número de páginas por marketplace')
     parser.add_argument('-f', '--format', choices=['csv', 'json'], default='csv', help='Formato de exportación')
@@ -120,7 +149,24 @@ async def main():
     parser.add_argument('--country', default='co', help='País para MercadoLibre (co, mx, ar, etc.)')
     parser.add_argument('--domain', default='com', help='Dominio para Amazon (com, es, mx, etc.)')
     
+    # Nuevos argumentos para mobile
+    parser.add_argument('--mobile', action='store_true', help='Usar modo mobile')
+    parser.add_argument('--device', help='Dispositivo específico a emular (ej: "iPhone 13")')
+    #parser.add_argument('--compare', action='store_true', help='Comparar desktop vs mobile')
+    parser.add_argument('--show-devices', action='store_true', help='Mostrar dispositivos disponibles')
+    
     args = parser.parse_args()
+    
+    # Mostrar dispositivos si se solicita
+    if args.show_devices:
+        show_available_devices()
+        return
+    
+    # Validar dispositivo
+    if args.device and args.device not in Settings.DEVICES_NAMES:
+        print(f"❌ Dispositivo '{args.device}' no válido.")
+        show_available_devices()
+        return
     
     # Crear scraper principal
     scraper = MarketplaceScraper()
@@ -131,6 +177,8 @@ async def main():
             marketplaces=args.marketplaces,
             query=args.query,
             max_pages=args.pages,
+            mobile=args.mobile,
+            device=args.device,
             country=args.country,
             domain=args.domain
         )
@@ -142,7 +190,7 @@ async def main():
         if products:
             scraper.export_results(products, args.format, args.by_marketplace)
         
-        print("\n¡Scraping completado!")
+        print("\n✅ ¡Scraping completado!")
         
     except Exception as e:
         print(f"\n❌ Error inesperado: {e}")
@@ -150,6 +198,7 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())    
 
+# python main.py "galleta" -m megatienda --country co
 # python main.py "televisor" -m falabella --country co
 # python main.py "airpods" -m falabella --country co
 # python main.py "smarthphone" -m mercadolibre --country co --page 4    

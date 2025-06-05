@@ -7,29 +7,41 @@ from config.settings import Settings
 class BrowserManager:
     """Wrapper para manejar Playwright de forma sencilla"""
     
-    def __init__(self):
+    def __init__(self, mobile: bool = False):
         self.playwright = None
         self.browser: Optional[Browser] = None
         self.context: Optional[BrowserContext] = None
         self.page: Optional[Page] = None
+        self.mobile = mobile
     
     async def start(self, **kwargs):
         """Inicia el navegador"""
         self.playwright = await async_playwright().start()
         
-        # Configuración del navegador
-        browser_config = {**Settings.BROWSER_CONFIG, **kwargs}
+        # Obtener configuración según el modo (desktop o mobile)
+        base_config = Settings.get_browser_config(self.mobile)
+        browser_config = {**base_config, **kwargs}
         
         self.browser = await self.playwright.chromium.launch(
             headless=browser_config['headless']
         )
         
-        # Crear contexto con user agent aleatorio
-        user_agent = random.choice(Settings.USER_AGENTS)
-        self.context = await self.browser.new_context(
-            user_agent=user_agent,
-            viewport=browser_config['viewport']
-        )
+        # Seleccionar user agent según el modo
+        user_agents = Settings.get_user_agents(self.mobile)
+        user_agent = random.choice(user_agents)
+        
+        # Configurar contexto con parámetros móviles si es necesario
+        context_config = {
+            "user_agent": user_agent,
+            "viewport": browser_config['viewport']
+        }
+        
+        # Añadir configuraciones específicas para mobile
+        if self.mobile:
+            context_config["is_mobile"] = browser_config.get('is_mobile', True)
+            context_config["has_touch"] = browser_config.get('has_touch', True)
+        
+        self.context = await self.browser.new_context(**context_config)
         
         # Crear página
         self.page = await self.context.new_page()
@@ -64,6 +76,10 @@ class BrowserManager:
         except Exception:
             pass
         return ""
+    
+    def is_mobile(self) -> bool:
+        """Retorna si está en modo mobile"""
+        return self.mobile
     
     async def get_attribute(self, selector: str, attribute: str) -> str:
         """Obtiene atributo de un elemento"""

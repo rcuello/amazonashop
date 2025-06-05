@@ -12,8 +12,8 @@ from scrapers.mercadolibre.product_extractor import ProductExtractor
 class MercadoLibreScraper(BaseScraper):
     """Scraper para MercadoLibre"""
     
-    def __init__(self, country: str = "co"):
-        super().__init__()
+    def __init__(self, country: str = "co", mobile: bool = False, device: Optional[str] = None):
+        super().__init__(mobile=mobile, device=device)
         self.marketplace_name = "MercadoLibre"
         self.country = country
         self.base_url = f"https://listado.mercadolibre.com.{country}"

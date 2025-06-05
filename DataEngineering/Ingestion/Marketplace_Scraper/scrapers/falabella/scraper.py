@@ -10,8 +10,8 @@ from scrapers.falabella.product_extractor import ProductExtractor
 class FalabellaScraper(BaseScraper):
     """Scraper para Falabella Colombia"""
     
-    def __init__(self, country: str = "co"):
-        super().__init__()
+    def __init__(self, country: str = "co", mobile: bool = False, device: Optional[str] = None):
+        super().__init__(mobile=mobile, device=device)
         self.marketplace_name = "Falabella"
         self.country = country
         self.base_url = f"https://www.falabella.com.{country}/falabella-{country}"

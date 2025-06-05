@@ -9,8 +9,10 @@ from config.settings import Settings
 class BaseScraper(ABC):
     """Clase base para todos los scrapers"""
     
-    def __init__(self):
-        self.browser_manager = BrowserManager()
+    def __init__(self, mobile: bool = False, device: Optional[str] = None):
+        self.mobile = mobile
+        self.device = device
+        self.browser_manager = BrowserManager(mobile=mobile)
         self.marketplace_name = ""
         self.base_url = ""
         self.products: List[Product] = []
