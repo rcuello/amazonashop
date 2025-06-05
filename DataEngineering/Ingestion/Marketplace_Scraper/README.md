@@ -234,3 +234,14 @@ BROWSER_CONFIG = {
 - Implementa logging detallado
 - Maneja excepciones apropiadamente
 - Testea con diferentes queries
+
+🚀 ¿Cómo instalar pytest?
+
+```bash
+pip install pytest
+```
+
+Y puedes correr las pruebas simplemente con:
+```bash
+pytest
+```
