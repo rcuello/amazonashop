@@ -56,7 +56,7 @@ class BaseScraper(ABC):
             await self.browser_manager.start()
             
             for page_num in range(1, max_pages + 1):
-                print(f"Scrapeando página {page_num} de {self.marketplace_name}")
+                print(f"📄 Scrapeando página {page_num} de 🌐 {self.marketplace_name}")
                 
                 # Construir URL
                 search_url = await self.build_search_url(query, page=page_num, **kwargs)
@@ -69,11 +69,11 @@ class BaseScraper(ABC):
                     continue
                 
                 # Ejecutar validaciones post-navegación
-                print(f"Ejecutando validaciones post-navegación para {self.marketplace_name}")
+                print(f"🧭 Ejecutando validaciones post-navegación para {self.marketplace_name}")
                 validation_success = await self.post_navigate_validation()
                 
                 if not validation_success:
-                    print(f"Falló la validación post-navegación en página {page_num}")
+                    print(f"❌ Falló la validación post-navegación en página {page_num}")
                     # Puedes decidir si continuar o saltar esta página
                     continue                
                 
@@ -85,7 +85,7 @@ class BaseScraper(ABC):
                 page_products = await self.scrape_current_page()
                 
                 if not page_products:
-                    print(f"No se encontraron productos en página {page_num}")
+                    print(f"⚠️ No se encontraron productos en página {page_num}")
                     break
                 
                 self.products.extend(page_products)
@@ -99,7 +99,7 @@ class BaseScraper(ABC):
                     )
             
         except Exception as e:
-            print(f"Error en búsqueda: {e}")
+            print(f"❌ Error en búsqueda: {e}")
         
         finally:
             await self.browser_manager.close()
@@ -117,6 +117,9 @@ class BaseScraper(ABC):
             
             if not product_elements:
                 return products
+                        
+            print(f"== 🔢 Se encontraron {len(product_elements)} elementos de productos == ")
+            print("🚀 Iniciando extracción de productos...")
             
             # Extraer información de cada producto
             for element in product_elements:
@@ -128,7 +131,8 @@ class BaseScraper(ABC):
                 except Exception as e:
                     print(f"Error extrayendo producto: {e}")
                     continue
-        
+                
+            print("== 🎉 Extracción de productos completada == ")        
         except Exception as e:
             print(f"Error scrapeando página: {e}")
         

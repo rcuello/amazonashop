@@ -2,7 +2,7 @@ import asyncio
 import argparse
 from typing import List
 from scrapers.mercadolibre.scraper import MercadoLibreScraper
-from scrapers.falabella import FalabellaScraper
+from scrapers.falabella.scraper import FalabellaScraper
 from utils.exporters import DataExporter
 from models.product import Product
 
@@ -124,24 +124,28 @@ async def main():
     
     # Crear scraper principal
     scraper = MarketplaceScraper()
-    
-    # Scrapear marketplaces
-    products = await scraper.scrape_multiple_marketplaces(
-        marketplaces=args.marketplaces,
-        query=args.query,
-        max_pages=args.pages,
-        country=args.country,
-        domain=args.domain
-    )
-    
-    # Mostrar resumen
-    scraper.print_summary(products)
-    
-    # Exportar resultados
-    if products:
-        scraper.export_results(products, args.format, args.by_marketplace)
-    
-    print("\n¡Scraping completado!")
+    try:
+        print(f"🚀 Iniciando scraping para: '{args.query}'")
+        # Scrapear marketplaces
+        products = await scraper.scrape_multiple_marketplaces(
+            marketplaces=args.marketplaces,
+            query=args.query,
+            max_pages=args.pages,
+            country=args.country,
+            domain=args.domain
+        )
+        
+        # Mostrar resumen
+        scraper.print_summary(products)
+        
+        # Exportar resultados
+        if products:
+            scraper.export_results(products, args.format, args.by_marketplace)
+        
+        print("\n¡Scraping completado!")
+        
+    except Exception as e:
+        print(f"\n❌ Error inesperado: {e}")
      
 if __name__ == "__main__":
     asyncio.run(main())    
