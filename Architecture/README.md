@@ -1,239 +1,232 @@
 # Patrones de Arquitectura para Sistemas Distribuidos
 
+> **Objetivo:** Comprender y aplicar patrones fundamentales para construir aplicaciones escalables, mantenibles y eficientes en sistemas distribuidos.
+
 ---
 
-## **Introducción: ¿Por qué los Patrones de Arquitectura?**
+## 🎓 **INTRODUCCIÓN**
 
-Los patrones de arquitectura son soluciones probadas a problemas recurrentes en el diseño de software. En sistemas distribuidos, estos patrones se vuelven críticos para manejar:
-- **Escalabilidad horizontal** y vertical
-- **Tolerancia a fallos** y resiliencia
-- **Consistencia eventual** vs. fuerte
-- **Latencia** y **throughput**
-- **Complejidad operacional**
+### ¿Qué son los Patrones de Arquitectura?
+
+Los patrones de arquitectura son **soluciones probadas y documentadas** para problemas recurrentes en el diseño de sistemas de software. Funcionan como "recetas de cocina" que los desarrolladores experimentados han perfeccionado a lo largo del tiempo.
+
+### 📊 **Problemas Fundamentales que Resuelven**
+
+| Problema | Sin Patrones | Con Patrones |
+|----------|--------------|--------------|
+| **Escalabilidad** | Sistema colapsa con muchos usuarios | Crecimiento horizontal automático |
+| **Mantenimiento** | Cambios pequeños rompen todo | Modificaciones aisladas y seguras |
+| **Fallos** | Error en un módulo tumba el sistema | Tolerancia a fallos y recuperación |
+| **Complejidad** | Código imposible de entender | Estructura predecible y documentada |
+| **Reutilización** | Reinventar la rueda constantemente | Componentes reutilizables |
+
+### 🎯 **Importancia en el Contexto Actual**
+
+- **Sistemas Distribuidos:** Aplicaciones modernas rara vez viven en un solo servidor
+- **Microservicios:** Arquitecturas complejas que requieren coordinación
+- **Cloud Computing:** Escalabilidad elástica y tolerancia a fallos
+- **DevOps:** Ciclos de desarrollo y despliegue acelerados
+
+---
 
 ## **CATEGORÍAS PRINCIPALES DE PATRONES**
 
 ### **1. PATRONES DE ARQUITECTURA DE APLICACIÓN**
 
-**Estructurales:**
-- **Layered (N-Tier):** Capas separadas (Presentation → Business → Data)
-- **Hexagonal (Ports & Adapters):** Núcleo de negocio aislado de dependencias externas
-- **Clean Architecture:** Dependencias apuntan hacia adentro
-- **Onion Architecture:** Similar a Clean, pero con capas en forma de cebolla
+#### 📦 **Patrones Estructurales**
 
-**De Componentes:**
-- **Component-Based:** Aplicación dividida en componentes reutilizables
-- **Plugin/Microkernel:** Núcleo mínimo + plugins extensibles
-- **Modular Monolith:** Monolito organizado en módulos bien definidos
+| Patrón | Descripción | Cuándo Usarlo | Ejemplo Real |
+|--------|-------------|---------------|--------------|
+| **Layered (N-Tier)** | División en capas (Presentación → Lógica → Datos) | Apps tradicionales, sistemas CRUD | Aplicaciones bancarias, ERP |
+| **Hexagonal (Ports & Adapters)** | Núcleo de negocio aislado de dependencias externas | Testing independiente, múltiples interfaces | APIs REST con múltiples DB |
+| **Clean Architecture** | Dependencias apuntan hacia el dominio central | Aplicaciones complejas con larga vida útil | Sistemas de gestión hospitalaria |
+| **Onion Architecture** | Capas concéntricas con dominio en el centro | Alta separación de responsabilidades | Plataformas de e-learning |
+
+#### 🧩 **Patrones de Componentes**
+
+| Patrón | Descripción | Casos Comunes | Ventajas |
+|--------|-------------|---------------|----------|
+| **Component-Based** | División por funcionalidades reutilizables | Interfaces modernas, SPAs | Reutilización, testing aislado |
+| **Plugin/Microkernel** | Núcleo extensible mediante plugins | IDEs, CMS, navegadores | Extensibilidad, modularidad |
+| **Modular Monolith** | Monolito organizado internamente en módulos | Transición gradual a microservicios | Simplicidad operacional |
+
+---
 
 ### **2. PATRONES DE SISTEMAS DISTRIBUIDOS**
 
-**De Comunicación:**
-- **Client-Server:** Cliente solicita, servidor responde
-- **Peer-to-Peer:** Nodos equivalentes que se comunican directamente
-- **Message Bus/Broker:** Comunicación a través de intermediario
-- **Request-Response:** Comunicación síncrona bidireccional
-- **Publish-Subscribe:** Productores publican, consumidores se suscriben
+#### 🔗 **Patrones de Comunicación**
 
-**De Descomposición:**
-- **Microservices:** Servicios pequeños e independientes
-- **Service-Oriented Architecture (SOA):** Servicios como unidades de funcionalidad
-- **Serverless/FaaS:** Funciones ejecutadas bajo demanda
+| Patrón | Explicación | Protocolo Común | Pros | Contras |
+|--------|-------------|-----------------|------|---------|
+| **Client-Server** | Cliente solicita, servidor responde | HTTP/HTTPS | Simple, familiar | Punto único de fallo |
+| **Peer-to-Peer** | Nodos equivalentes colaborando | BitTorrent, Blockchain | Escalabilidad, sin punto central | Complejidad de sincronización |
+| **Message Bus/Broker** | Comunicación mediante intermediario | Apache Kafka, RabbitMQ | Desacoplamiento, asíncrono | Latencia adicional |
+| **Request-Response** | Comunicación síncrona bidireccional | RPC, GraphQL | Inmediatez, simplicidad | Bloqueo, timeouts |
+| **Publish-Subscribe** | Emisores publican, consumidores se suscriben | Redis Pub/Sub, AWS SNS | Escalabilidad, flexibilidad | Eventual consistency |
+
+#### 🧩 **Patrones de Descomposición**
+
+| Patrón | Granularidad | Complejidad Operacional | Mejor Para |
+|--------|--------------|-------------------------|------------|
+| **Microservices** | Una responsabilidad por servicio | Alta | Equipos grandes, alta escala |
+| **SOA** | Servicios coordinados por bus | Media | Integración empresarial |
+| **Serverless/FaaS** | Funciones ejecutadas bajo demanda | Baja | Cargas de trabajo intermitentes |
+
+---
 
 ### **3. PATRONES DE MANEJO DE DATOS**
 
-**De Persistencia:**
-- **Repository Pattern:** Abstracción de acceso a datos
-- **Unit of Work:** Mantiene lista de objetos afectados por transacción
-- **Data Access Object (DAO):** Interfaz para operaciones de base de datos
-- **Active Record:** Objetos que se persisten a sí mismos
+#### 🗄️ **Patrones de Persistencia**
 
-**De Consistencia:**
-- **CQRS (Command Query Responsibility Segregation):** Separar lecturas de escrituras
-- **Event Sourcing:** Almacenar eventos en lugar de estados
-- **Saga Pattern:** Transacciones distribuidas
-- **Outbox Pattern:** Consistencia en mensajería
+| Patrón | Responsabilidad | Complejidad | Cuándo Usar |
+|--------|-----------------|-------------|-------------|
+| **Repository** | Abstrae acceso a datos | Baja | Intercambio de fuentes de datos |
+| **Unit of Work** | Coordina transacciones múltiples | Media | Operaciones complejas con rollback |
+| **DAO (Data Access Object)** | Interfaz CRUD especializada | Baja | Acceso directo a tablas |
+| **Active Record** | Objeto con lógica y persistencia | Baja | Prototipos rápidos, Rails-style |
+
+#### 🔐 **Patrones de Consistencia**
+
+| Patrón | Problema que Resuelve | Complejidad | Trade-offs |
+|--------|-----------------------|-------------|------------|
+| **CQRS** | Optimización diferenciada de lectura/escritura | Media | Mayor complejidad por mejor performance |
+| **Event Sourcing** | Auditoría completa y reconstrucción de estados | Alta | Historial completo vs. complejidad |
+| **Saga** | Transacciones distribuidas sin 2PC | Alta | Eventual consistency vs. atomicidad |
+| **Outbox** | Consistencia entre DB y mensajería | Media | Garantías de entrega vs. latencia |
+
+---
 
 ### **4. PATRONES DE PROCESAMIENTO**
 
-**De Flujo de Datos:**
-- **Pipe and Filter:** Datos fluyen a través de filtros conectados
-- **MapReduce:** Mapear datos → Reducir resultados
-- **Stream Processing:** Procesamiento continuo de flujo de datos
-- **Batch Processing:** Procesamiento por lotes
+#### 🔄 **Patrones de Flujo de Datos**
 
-**De Eventos:**
-- **Event-Driven Architecture:** Reaccionar a eventos
-- **Event Streaming:** Flujo continuo de eventos
-- **CQRS + Event Sourcing:** Combinación poderosa para sistemas complejos
+| Patrón | Modelo de Ejecución | Casos de Uso | Herramientas |
+|--------|---------------------|--------------|--------------|
+| **Pipe & Filter** | Transformaciones en cadena | ETL, procesamiento de imágenes | Unix pipes, Apache Camel |
+| **MapReduce** | Paralelización masiva | Big Data, análisis distribuido | Hadoop, Spark |
+| **Stream Processing** | Procesamiento en tiempo real | IoT, detección de fraude | Kafka Streams, Apache Flink |
+| **Batch Processing** | Procesamiento programado en lotes | Reports nocturnos, respaldos | Cron jobs, Apache Airflow |
+
+#### 📣 **Patrones Basados en Eventos**
+
+| Patrón | Acoplamiento | Orden de Eventos | Ideal Para |
+|--------|--------------|------------------|------------|
+| **Event-Driven Architecture** | Bajo | No garantizado | Sistemas reactivos |
+| **Event Streaming** | Muy bajo | Preservado | Sistemas de tiempo real |
+| **CQRS + Event Sourcing** | Bajo | Total | Auditoría y reconstrucción |
+
+---
 
 ### **5. PATRONES DE ESCALABILIDAD Y PERFORMANCE**
 
-**De Escalabilidad:**
-- **Load Balancer:** Distribuir carga entre instancias
-- **Sharding:** Dividir datos horizontalmente
-- **Read Replicas:** Copias de solo lectura
-- **Circuit Breaker:** Prevenir cascadas de fallos
+#### 📈 **Patrones de Escalabilidad**
 
-**De Cache:**
-- **Cache-Aside:** Aplicación maneja cache
-- **Write-Through:** Escribir a cache y DB simultáneamente  
-- **Write-Behind:** Escribir a cache primero, DB después
-- **Refresh-Ahead:** Refrescar cache antes de expiración
+| Patrón | Tipo de Escalamiento | Implementación | Cuándo Aplicar |
+|--------|----------------------|----------------|----------------|
+| **Load Balancer** | Horizontal | Nginx, HAProxy, AWS ALB | Múltiples instancias |
+| **Sharding** | Horizontal de datos | Clave de partición | Base de datos grande |
+| **Read Replicas** | Horizontal de lectura | Master-Slave | Más lecturas que escrituras |
+| **Circuit Breaker** | Prevención de cascada | Hystrix, Resilience4j | Dependencias externas |
+
+#### ⚡ **Patrones de Cache**
+
+| Patrón | Control | Consistencia | Latencia de Escritura |
+|--------|---------|--------------|----------------------|
+| **Cache-Aside** | Aplicación | Eventual | Mínima |
+| **Write-Through** | Cache | Fuerte | Alta |
+| **Write-Behind** | Cache | Eventual | Mínima |
+| **Refresh-Ahead** | Cache | Eventual | Variable |
+
+---
 
 ### **6. PATRONES DE INTEGRACIÓN**
 
-**Enterprise Integration Patterns:**
-- **Message Channel:** Canal para enviar mensajes
-- **Message Router:** Dirigir mensajes según contenido
-- **Message Translator:** Traducir entre formatos
-- **Message Filter:** Filtrar mensajes no deseados
-- **Aggregator:** Combinar mensajes relacionados
+#### 🔌 **Enterprise Integration Patterns (EIP)**
 
-## **EJEMPLO PRÁCTICO: E-COMMERCE**
+| Patrón | Función | Caso de Uso | Tecnologías |
+|--------|---------|-------------|-------------|
+| **Message Channel** | Transporte de mensajes | Comunicación asíncrona | RabbitMQ, Apache Kafka |
+| **Message Router** | Direccionamiento inteligente | Orquestación de flujos | Apache Camel, MuleSoft |
+| **Message Translator** | Transformación de formatos | Integración de sistemas legacy | Apache NiFi, Talend |
+| **Message Filter** | Filtrado selectivo | Reducción de ruido | Stream processing |
+| **Aggregator** | Combinación de mensajes | Correlación de eventos | Complex Event Processing |
 
-```csharp
-// Combinando múltiples patrones
-public class ECommerceSystem
-{
-    // 1. Clean Architecture (capas)
-    // 2. CQRS (separar comandos de queries)
-    // 3. Event Sourcing (historial de eventos)
-    // 4. Outbox Pattern (consistencia)
-    // 5. Repository Pattern (datos)
-    
-    public class OrderCommandHandler
-    {
-        private readonly IOrderRepository _repository;
-        private readonly IEventStore _eventStore;
-        private readonly IOutboxService _outbox;
-        
-        public async Task<Result> CreateOrder(CreateOrderCommand command)
-        {
-            using var transaction = await _context.BeginTransactionAsync();
-            
-            // Domain logic
-            var order = Order.Create(command.CustomerId, command.Items);
-            
-            // Repository pattern
-            await _repository.SaveAsync(order);
-            
-            // Event sourcing
-            await _eventStore.SaveEventsAsync(order.Id, order.Events);
-            
-            // Outbox pattern
-            await _outbox.PublishEventsAsync(order.Events);
-            
-            await transaction.CommitAsync();
-            return Result.Success();
-        }
-    }
-}
-```
-
-## **GUÍA DE APRENDIZAJE PROGRESIVO**
-
-**Nivel Básico:**
-1. Layered Architecture
-2. MVC/MVP/MVVM
-3. Repository Pattern
-4. Factory Pattern
-
-**Nivel Intermedio:**
-5. Clean Architecture
-6. CQRS
-7. Event-Driven Architecture
-8. Microservices basics
-
-**Nivel Avanzado:**
-9. Event Sourcing
-10. Saga Pattern
-11. Distributed patterns
-12. Performance patterns
 
 
 ---
 
-## **RECURSOS ACADÉMICOS Y PROFESIONALES**
+## 💡 **CASOS DE ESTUDIO COMPARATIVOS**
 
-### **📚 Libros Fundamentales**
+### **Caso 1: Sistema de Streaming (Netflix-like)**
 
-**Nivel Intermedio:**
-- *"Patterns of Enterprise Application Architecture"* - Martin Fowler
-  - **Relevancia:** Fundamentos de patrones empresariales
+| Componente | Patrón Aplicado | Justificación |
+|------------|-----------------|---------------|
+| **Catálogo** | CQRS + Read Replicas | Millones de búsquedas, pocas actualizaciones |
+| **Recomendaciones** | Event-Driven | Reacción a visualizaciones en tiempo real |
+| **Reproductor** | Circuit Breaker | Tolerancia a fallos en CDN |
+| **Facturación** | Saga Pattern | Transacciones distribuidas complejas |
+
+### **Caso 2: Sistema Bancario**
+
+| Operación | Patrón Usado | Por Qué |
+|-----------|--------------|---------|
+| **Transferencias** | Event Sourcing | Auditoría completa obligatoria |
+| **Saldos** | CQRS | Optimización de consultas frecuentes |
+| **Notificaciones** | Publish-Subscribe | Múltiples canales (SMS, email, push) |
+| **Seguridad** | Hexagonal | Aislamiento del core bancario |
+
+---
+
+## 📚 **RECURSOS ACADÉMICOS ESTRUCTURADOS**
+
+### **📖 Libros por Nivel de Competencia**
+
+#### **Nivel Intermedio**
+- 📘 *"Patterns of Enterprise Application Architecture"* - Martin Fowler
   - **Capítulos clave:** 9 (Domain Logic), 10 (Data Source), 11 (Object-Relational)
-
-- *"Clean Architecture"* - Robert C. Martin
+  - **Tiempo estimado:** 6 semanas de estudio
+  
+- 📗 *"Clean Architecture"* - Robert C. Martin
   - **Enfoque:** Principios SOLID aplicados a arquitectura
   - **Conceptos clave:** Dependency rule, use cases, boundaries
 
-**Nivel Avanzado:**
-- *"Building Microservices"* - Sam Newman (2nd Edition, 2021)
-  - **Actualización:** Incluye service mesh, observability moderna
+#### **Nivel Avanzado
+- 📙 *"Building Microservices"* - Sam Newman (2nd Edition, 2021)
+  - **Actualización:** Service mesh, observability moderna
   - **Casos reales:** Netflix, Amazon, Spotify
-
-- *"Microservices Patterns"* - Chris Richardson
+  
+- 📕 *"Microservices Patterns"* - Chris Richardson
   - **Enfoque práctico:** Implementación con Spring Boot
-  - **Patrones específicos:** Saga, Event sourcing, API composition
+  - **Patrones específicos:** Saga, Event sourcing, API composition  
 
-- "Enterprise Integration Patterns" - Hohpe & Woolf
+- 📕 *"Enterprise Integration Patterns"* - Hohpe & Woolf
 
-### **🌐 Recursos Online**
+### **🌐 Recursos Online Curados**
 
-**Sitios Web Especializados:**
-- **Microsoft Architecture Center**: https://docs.microsoft.com/en-us/azure/architecture/
-  - Patrones específicos para cloud computing
-  - Reference architectures para Azure
+#### **Plataformas Oficiales**
+- **Microsoft Architecture Center:** Patrones cloud-native
+- **AWS Architecture Center:** Well-Architected Framework
+- **Martin Fowler's Blog:** Artículos fundamentales sobre CQRS, Event Sourcing
 
-- **AWS Architecture Center**: https://aws.amazon.com/architecture/
-  - Well-Architected Framework
-  - Solution architecture patterns
+#### **Cursos Especializados**
+- **Pluralsight:** .NET Architecture patterns
+- **Coursera:** "Cloud Computing Specialization" (University of Illinois)
+- **edX:** "Software Architecture & Design" (University of Alberta)
 
-- **Martin Fowler's Blog**: https://martinfowler.com/
-  - **Artículos clave:** 
-    - "Microservices" (2014)
-    - "CQRS" (2011)
-    - "Event Sourcing" (2005)
+### **📊 Papers Académicos Fundamentales**
 
-**Plataformas de Aprendizaje:**
-- **Pluralsight**: Cursos especializados en .NET, Java, microservices
-- **Coursera**: "Cloud Computing Specialization" (University of Illinois)
-- **edX**: "Introduction to DevOps" (Microsoft)
-
-### **📖 Papers Académicos Fundamentales**
-
-**Sistemas Distribuidos:**
-- *"Time, Clocks, and the Ordering of Events in a Distributed System"* - Leslie Lamport (1978)
+#### **Sistemas Distribuidos**
+- *"Time, Clocks, and the Ordering of Events"* - Leslie Lamport (1978)
 - *"The Byzantine Generals Problem"* - Lamport, Shostak, Pease (1982)
-- *"Harvest, Yield, and Scalable Tolerant Systems"* - Fox & Brewer (1999)
+- *"CAP Theorem"* - Eric Brewer (2000)
 
-**Arquitectura de Software:**
-- *"Who Needs an Architect?"* - Martin Fowler (2003)
+#### **Arquitectura de Software**
 - *"Software Architecture in Practice"* - Bass, Clements, Kazman
+- *"Domain-Driven Design"* - Eric Evans
 
-### **🛠️ Herramientas y Frameworks**
+---
 
-**Para Práctica:**
-- **Docker & Kubernetes**: Containerización y orquestación
-- **Apache Kafka**: Event streaming platform
-- **Elasticsearch**: Search and analytics engine
-- **Grafana + Prometheus**: Monitoring y observability
-- **Jaeger**: Distributed tracing
-
-**IDEs y Extensiones:**
-- **Visual Studio Code**: Extensions para Docker, Kubernetes
-- **IntelliJ IDEA**: Plugins para Spring, microservices
-- **Rider**: .NET development con arquitectura support
-
-### **📊 Conferencias y Comunidades**
-
-**Conferencias Internacionales:**
-- **QCon**: Software development conference
-- **GOTO**: Developer conference
-- **O'Reilly Software Architecture**: Architecture-focused
-- **KubeCon**: Cloud native computing
-
-**Comunidades Online:**
-- **Reddit**: r/softwaredevelopment, r/microservices
-- **Stack Overflow**: Tags específicos por patrón
-- **GitHub**: Repositorios de ejemplo y templates
+### **💡 Herramientas de Apoyo Visual**
+- **Diagramas C4:** Context, Container, Component, Code
+- **Event Storming:** Modelado colaborativo de eventos
+- **Architecture Decision Records (ADR):** Documentación de decisiones
