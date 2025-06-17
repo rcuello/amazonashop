@@ -190,7 +190,8 @@ Los patrones de arquitectura son **soluciones probadas y documentadas** para pro
   - **Enfoque:** Principios SOLID aplicados a arquitectura
   - **Conceptos clave:** Dependency rule, use cases, boundaries
 
-#### **Nivel Avanzado
+#### **Nivel Avanzado**
+
 - 📙 *"Building Microservices"* - Sam Newman (2nd Edition, 2021)
   - **Actualización:** Service mesh, observability moderna
   - **Casos reales:** Netflix, Amazon, Spotify
@@ -201,7 +202,7 @@ Los patrones de arquitectura son **soluciones probadas y documentadas** para pro
 
 - 📕 *"Enterprise Integration Patterns"* - Hohpe & Woolf
 
-### **🌐 Recursos Online Curados**
+### **🌐 Recursos Online**
 
 #### **Plataformas Oficiales**
 - **Microsoft Architecture Center:** Patrones cloud-native
