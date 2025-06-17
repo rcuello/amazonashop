@@ -56,7 +56,7 @@ class MegaTiendaScraper(BaseScraper):
             await self._wait_for_content_load()
             
             # 3. Extraer información de categorías si está disponible
-            await self._extract_category_info()
+            #await self._extract_category_info()
             
             # 4. Verificar que se cargaron productos
             if not await self._verify_products_loaded():
@@ -74,7 +74,11 @@ class MegaTiendaScraper(BaseScraper):
         """Maneja popups típicos de Megatiendas"""
         try:
             page = self.browser_manager.page
-            print("🔍 Verificando popups de Megatiendas...")
+            print("🔍 Verificando popup bloqueante de Megatiendas [Como quieres recibir tu pedido]...")
+            
+            print("   ⏳ Esperando que la página cargue completamente...")
+            await page.wait_for_function("document.readyState === 'complete'")
+            print("   ✅ Página cargada.")
                         
             
             # Pasos para remover el popup de Megatiendas (No se puede cerrar sin diligenciarlo):            
@@ -84,32 +88,14 @@ class MegaTiendaScraper(BaseScraper):
             # 4. Seleccionar (Html Radio) "Tienda" => Megatiendas Prado
             # 5. Click en Boton "Guardar"
                         
-            button_element = await page.wait_for_selector('text="Recoge en tienda"', timeout=3000)
+            button_element = await page.wait_for_selector('text="Recoge en tienda"', timeout=5000)
             await button_element.click()
             await asyncio.sleep(1)
-            #await page.keyboard.press("Tab")
-            #await asyncio.sleep(1)
-            
-            #tag = await page.evaluate("document.activeElement.tagName")
-            #print(f"Tag enfocado: {tag}") # Input de departamento
-            
-            #await page.keyboard.type("Bolívar")
-            #await asyncio.sleep(1)
-            #await page.keyboard.press("Tab")
-            #await asyncio.sleep(1)
-            #departamento_selector="#react-select-5-input"
-            #await page.click(departamento_selector)
-            #await page.fill(departamento_selector, 'Bolívar')
-            #await asyncio.sleep(1)
-            
+
             region_input_selector = 'div.megatiendas-delivery-modal-1-x-ModalFormAddress__card_content_store--active input[type="text"]'
-            
-            
             region_element_inputs = await page.query_selector_all(region_input_selector)
             
-            
-            print(f"region_element_inputs: {len(region_element_inputs)} elementos")
-            #print(f"button_element_inputs: {len(button_element_inputs)} elementos")
+            #print(f"region_element_inputs: {len(region_element_inputs)} elementos")
             
             departamento_element = region_element_inputs[0]
             ciudad_element = region_element_inputs[1]
@@ -126,64 +112,11 @@ class MegaTiendaScraper(BaseScraper):
             await page.keyboard.press("ArrowDown")
             await page.keyboard.press("Enter")
             await asyncio.sleep(1)
-            #guardar_element = await page.get_by_role("button", name="Guardar")            
-            button_selector='div.megatiendas-delivery-modal-1-x-ModalFormAddress__card_content button:has-text("Guardar")'
-            guardar_element = await page.query_selector(button_selector)
+            await page.get_by_role("button", name="Guardar").click()
             
-            if not guardar_element:
-                print("No se pudo encontrar el elemento 'Guardar'")
+            # npx playwright codegen https://www.megatiendas.co/galleta?_q=galleta
             
-            print("guardar_element:", guardar_element)
-            await guardar_element.focus()    
-            await page.keyboard.press("Enter")
-            #await guardar_element.click()
-            await asyncio.sleep(1)
-            
-            #await asyncio.sleep(1)
-            
-            #tag = await page.evaluate("document.activeElement.tagName")
-            #print(f"Tag enfocado: {tag}") # Input de Ciudad
-            
-            
-            #tag = await page.evaluate("document.activeElement.tagName")
-            #print(f"Tag enfocado: {tag}") # Input de Ciudad
-            
-            #await page.keyboard.type("Cartagena")
-            #await asyncio.sleep(1)
-            
-            #page.query_selector_all(tienda_selector)[0].click()
-            #await asyncio.sleep(1)
-            
-            #guardar_element = await page.get_by_role("button", name="Guardar")
-            #await guardar_element.wait_for(state="visible")
-            #await guardar_element.click()
-            
-            #await asyncio.sleep(1)
-            
-            
-            #departamento_selector="#react-select-5-input"
-            #ciudad_selector="#react-select-6-input"
-            #tienda_selector='input[type="radio"]'
-            
-            
-            # megatiendas-delivery-modal-1-x-ModalFormAddress__store_Input
-            # megatiendas-delivery-modal-1-x-ModalFormAddress__store_Input megatiendas-delivery-modal-1-x-ModalFormAddress__store_Input--checked
-            
-            #await page.click(departamento_selector)
-            #await page.fill(departamento_selector, 'Bolívar')
-            #await asyncio.sleep(1)
-            #await page.click(ciudad_selector)
-            #await page.fill(ciudad_selector, 'Cartagena')
-            #await asyncio.sleep(1)
-            #page.query_selector_all(tienda_selector)[0].click()
-            #await asyncio.sleep(1)
-            
-            #guardar_element = await page.get_by_role("button", name="Guardar")
-            #await guardar_element.wait_for(state="visible")
-            #await guardar_element.click()
-            
-            #await asyncio.sleep(1)
-            
+            print("✅ Popups de Megatiendas manejados")
             
                     
         except Exception as e:
@@ -197,14 +130,8 @@ class MegaTiendaScraper(BaseScraper):
             
             # Esperar por elementos típicos de Megatiendas
             content_selectors = [
-                '.product-item',
-                '.product-card',
-                '.product-container',
-                '.shelf-item',
-                '.product-tile',
-                '[data-testid="product-item"]',
-                '.vtex-product-summary',
-                '.product-summary'
+                '.gallery-layout-container',
+                '.vtex-store-components-3-x-container'
             ]
             
             for selector in content_selectors:
@@ -219,38 +146,7 @@ class MegaTiendaScraper(BaseScraper):
             print("⚠️ No se detectó contenido específico de Megatiendas, continuando...")
             
         except Exception as e:
-            print(f"⚠️ Error esperando contenido de Megatiendas: {e}")
-    
-    async def _extract_category_info(self):
-        """Extrae información de categorías desde el breadcrumb"""
-        try:
-            print("📂 Extrayendo información de categorías de Megatiendas...")
-            
-            breadcrumb = await self.extract_breadcrumb()
-            self.category_info['breadcrumb'] = breadcrumb
-            
-            if not breadcrumb:
-                print("⚠️ No se pudo extraer breadcrumb de Megatiendas")
-                return
-            
-            # Procesar breadcrumb para extraer categorías
-            for item in breadcrumb:
-                position = item.get('position', 0)
-                
-                if position == 1:
-                    self.category_info['parent_category'] = item['name']
-                    self.category_info['parent_category_url'] = item['url']
-                elif position == 2:
-                    self.category_info['category'] = item['name']
-                    self.category_info['category_url'] = item['url']
-                elif position == 3:
-                    self.category_info['category2'] = item['name']
-                    self.category_info['category2_url'] = item['url']
-            
-            print(f"✅ Categorías de Megatiendas extraídas correctamente")
-            
-        except Exception as e:
-            print(f"❌ Error extrayendo categorías de Megatiendas: {e}")
+            print(f"⚠️ Error esperando contenido de Megatiendas: {e}")    
     
     async def _verify_products_loaded(self) -> bool:
         """Verifica que los productos se hayan cargado"""
@@ -259,16 +155,10 @@ class MegaTiendaScraper(BaseScraper):
             print("🔍 Verificando carga de productos de Megatiendas...")
             
             # Selectores posibles para productos de Megatiendas
-            product_selectors = [
-                '.product-item',
-                '.product-card',
-                '.product-container',
-                '.shelf-item',
-                '.product-tile',
+            product_selectors = [                
                 '[data-testid="product-item"]',
-                '.vtex-product-summary',
-                '.product-summary',
-                '.product-list-item'
+                '.vtex-product-summary-2-x-productBrand'
+                '.vtex-product-summary-2-x-container',
             ]
             
             for selector in product_selectors:
